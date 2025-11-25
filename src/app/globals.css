@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #064045;
+  --color-secondary: #FFE273;
+  --color-secondary-dark: #9BB3B5;
+  --color-secondary-light: #707677;
+  --color-bg-primary: #F5F7F8;
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+:root {
+  font-size: 62.5%;
+  font-family: 'Roboto', sans-serif;
+}
