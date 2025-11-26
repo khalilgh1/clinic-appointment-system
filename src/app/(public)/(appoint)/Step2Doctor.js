@@ -1,103 +1,48 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useDoctors } from '../../../hooks/useDoctors';
+import { useBooking } from '../../../context/BookingContext';
+import DoctorCard from '../../../components/ui/DoctorCard';
 
-// DoctorCard Component
-const DoctorCard = ({ doctor, isSelected, onClick }) => {
-  const { name, specialty, description, email } = doctor;
-  
-  return (
-    <div
-      className={`bg-white rounded-lg p-6 shadow-sm flex flex-col h-full transition-all border cursor-pointer
-        ${isSelected ? 'border-2 border-primary shadow-lg' : 'border border-gray-200 hover:border-primary/40 hover:shadow-md'}`}
-      onClick={onClick}
-    >
-      <div className="mb-4">
-        <h3 className="text-xl font-semibold text-primary">{name}</h3>
-        <p className="text-secondary-light mt-1">{specialty}</p>
-      </div>
+const Step2Doctor = ({ onNext, onBack }) => {
+  const { state, dispatch } = useBooking();
+  const { doctors, loading, error } = useDoctors(state.selectedService?.id);
 
-      {description && (
-        <p className="text-secondary-light text-sm mb-4 leading-relaxed">{description}</p>
-      )}
-
-      <div className="mt-auto pt-4 border-t border-gray-100">
-        <span className="text-primary text-sm font-medium">{email}</span>
-      </div>
-    </div>
-  );
-};
-
-// Step2Doctor Component
-const Step2Doctor = ({ selectedDoctor, onSelectDoctor, onNext }) => {
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      setLoading(true);
-
-      // Données complètes comme dans votre capture
-      const data = [
-        { 
-          id: 1,
-          name: "Dr Nadir Kedji", 
-          specialty: "Gynécologue obstétricien", 
-          description: "Expert PMA (20+ ans)", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 2,
-          name: "Dr Sadat Nesrine", 
-          specialty: "Spécialiste en fertilité", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 3,
-          name: "Dr. Selmane", 
-          specialty: "Spécialiste en fertilité", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 4,
-          name: "Pr Mourad Semrouni", 
-          specialty: "Endocrinologue dialektologue", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 5,
-          name: "Dr Bouchra Rezig", 
-          specialty: "Médecin nutritionniste", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 6,
-          name: "Mme Samia Yaker", 
-          specialty: "Biologiste de la reproduction", 
-          email: "contact@ferival.dz" 
-        },
-        { 
-          id: 7,
-          name: "Mme Sabrina Ferrane", 
-          specialty: "Embryologiste", 
-          email: "contact@ferival.dz" 
-        }
-      ];
-
-      setDoctors(data);
-      setLoading(false);
-    };
-
-    fetchDoctors();
-  }, []);
+  const handleSelectDoctor = (doctor) => {
+    dispatch({ type: 'SET_DOCTOR', payload: doctor });
+  };
 
   const handleNext = (e) => {
     e.preventDefault();
-    if (selectedDoctor) {
+    if (state.selectedDoctor) {
       onNext();
     }
   };
+
+  // Gestion des états de chargement et d'erreur
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="text-gray-500">Chargement des médecins...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="text-red-500">Erreur: {error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-primary text-white px-4 py-2 rounded"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -105,9 +50,9 @@ const Step2Doctor = ({ selectedDoctor, onSelectDoctor, onNext }) => {
         Sélectionnez votre médecin
       </h1>
 
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="text-gray-500">Chargement des médecins...</div>
+      {doctors.length === 0 ? (
+        <div className="text-center py-12 text-gray-500">
+          Aucun médecin disponible pour ce service
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,20 +60,28 @@ const Step2Doctor = ({ selectedDoctor, onSelectDoctor, onNext }) => {
             <DoctorCard 
               key={doctor.id} 
               doctor={doctor} 
-              isSelected={selectedDoctor?.id === doctor.id}
-              onClick={() => onSelectDoctor(doctor)}
+              isSelected={state.selectedDoctor?.id === doctor.id}
+              onClick={() => handleSelectDoctor(doctor)}
             />
           ))}
         </div>
       )}
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-8 flex justify-between">
+        <button
+          onClick={onBack}
+          className="bg-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
+        >
+          ← Retour
+        </button>
         <button
           onClick={handleNext}
-          disabled={!selectedDoctor}
-          className={`w-full sm:w-auto max-w-full sm:max-w-[260px] mx-auto
-                      font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2
-                      transition-colors ${selectedDoctor ? 'bg-secondary text-primary hover:bg-secondary/90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+          disabled={!state.selectedDoctor}
+          className={`font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
+            state.selectedDoctor 
+              ? 'bg-secondary text-primary hover:bg-secondary/90' 
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
         >
           ÉTAPE SUIVANTE
           <ArrowRight className="w-5 h-5" />

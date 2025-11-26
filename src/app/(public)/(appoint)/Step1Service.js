@@ -1,10 +1,11 @@
 "use client"
 
-import React from 'react';
-import { Heart, Users, Activity, Microscope, Phone, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Heart, Users, Activity, Microscope, Phone } from 'lucide-react';
+import { useBooking } from '@/context/BookingContext';
 
-// Mock data function
-const getServices = () => [
+// Données directement dans le composant
+const servicesData = [
   {
     id: 1,
     name: 'Fertilité & PMA',
@@ -50,7 +51,7 @@ const getServices = () => [
   }
 ];
 
-// Icon mapping component
+// Icon mapping component - DOIT ÊTRE DÉFINI AVANT ServiceCard
 const ServiceIcon = ({ iconName, className }) => {
   const icons = {
     heart: Heart,
@@ -64,7 +65,7 @@ const ServiceIcon = ({ iconName, className }) => {
   return <Icon className={className} />;
 };
 
-// ServiceCard Component
+// ServiceCard Component - DOIT ÊTRE APRÈS ServiceIcon
 const ServiceCard = ({ service, onClick, isSelected }) => {
   return (
     <div 
@@ -100,35 +101,39 @@ const ServiceCard = ({ service, onClick, isSelected }) => {
   );
 };
 
-// ServiceList Component (CORRIGÉ - sans formulaire)
-const ServiceList = ({ services, selectedService, onServiceSelect }) => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-11 items-stretch">
-      {services.map(service => (
-        <div
-          key={service.id}
-          className="cursor-pointer"
-          onClick={() => onServiceSelect(service)}
-        >
-          <ServiceCard 
-            service={service}
-            isSelected={selectedService?.id === service.id}
-          />
-        </div>
-      ))}
-    </div>
-  );
-};
+const Step1Service = ({ onNext }) => {
+  const { state, dispatch } = useBooking();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const Step1Service = ({ selectedService, onSelectService, onNext }) => {
-  const services = getServices();
+  useEffect(() => {
+    // Chargement simple sans API
+    const timer = setTimeout(() => {
+      setServices(servicesData);
+      setLoading(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleSelectService = (service) => {
+    dispatch({ type: 'SET_SERVICE', payload: service });
+  };
 
   const handleNext = (e) => {
     e.preventDefault();
-    if (selectedService) {
+    if (state.selectedService) {
       onNext();
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="text-gray-500">Chargement des services...</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -136,19 +141,29 @@ const Step1Service = ({ selectedService, onSelectService, onNext }) => {
         Sélectionnez un service
       </h1>
 
-      <ServiceList
-        services={services}
-        selectedService={selectedService}
-        onServiceSelect={onSelectService}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-11 items-stretch">
+        {services.map(service => (
+          <div
+            key={service.id}
+            className="cursor-pointer"
+            onClick={() => handleSelectService(service)}
+          >
+            <ServiceCard 
+              service={service}
+              isSelected={state.selectedService?.id === service.id}
+              onClick={handleSelectService}
+            />
+          </div>
+        ))}
+      </div>
 
       <div className="mt-8 flex justify-center">
         <button
           onClick={handleNext}
-          disabled={!selectedService}
+          disabled={!state.selectedService}
           className={`w-full sm:w-auto max-w-full sm:max-w-[260px] mx-auto
                       font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2
-                      transition-colors ${selectedService ? 'bg-secondary text-primary hover:bg-secondary/90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                      transition-colors ${state.selectedService ? 'bg-secondary text-primary hover:bg-secondary/90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
         >
           ÉTAPE SUIVANTE
           <ArrowRight className="w-5 h-5" />

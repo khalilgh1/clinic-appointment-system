@@ -59,21 +59,18 @@ const Sidebar = ({ currentStep, contactPhone }) => {
   const steps = ['Service', 'Médecin', 'Date & Heure', 'Informations'];
   
   return (
-    <div className="bg-primary text-white p-6 min-h-screen flex flex-col">
-      {/* Logo ou titre de la clinique */}
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold">FERIVAL</h1>
-        <p className="text-sm text-gray-300 mt-2">Centre de Fertilité</p>
+    <div className="bg-primary text-white h-full flex flex-col overflow-y-auto">
+      <div className="p-6 flex-1">
+        
+        {/* step indicator */}
+        <div className="flex-1">
+          <h2 className="text-lg font-semibold mb-6">Votre réservation</h2>
+          <StepIndicator steps={steps} currentStep={currentStep} />
+        </div>
       </div>
       
-      {/* Indicateur d'étapes */}
-      <div className="flex-1">
-        <h2 className="text-lg font-semibold mb-6">Votre réservation</h2>
-        <StepIndicator steps={steps} currentStep={currentStep} />
-      </div>
-      
-      {/* Contact */}
-      <div className="mt-auto pt-8 border-t border-gray-600">
+      {/* Contact  */}
+      <div className="p-6 border-t border-gray-600 mt-auto">
         <p className="text-sm text-gray-300 mb-3">Besoin d'aide ?</p>
         <p className="text-lg font-semibold mb-1">{contactPhone}</p>
         <p className="text-sm text-gray-300">contact@ferival.dz</p>
