@@ -1,36 +1,35 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import TitleBlock from "./TitleBlock";
 import DoctorCard from "./DoctorCard";
 import { HiOutlineArrowRight } from "react-icons/hi2";
+import {supabase} from "@/lib/supabase/client"; // your supabase client
 
 export default function DoctorsSection() {
-  const doctorsData = [
-    {
-      photo: "/home/doctor1.png",
-      name: "Dr Nadir Kedji",
-      specialty: "Gynécologue obstétricien",
-      description: "Expert PMA - 20+ ans",
-    },
-    {
-      photo: "/home/doctor2.png",
-      name: "Dr Sadat Nesrine",
-      specialty: "Spécialiste en fertilité",
-      description: "Approche personnalisée",
-    },
-    {
-      photo: "/home/doctor3.png",
-      name: "Dr Mourad Semrouni",
-      specialty: "Endocrinologue",
-      description: "Troubles hormonaux",
-    },
-    {
-      photo: "/home/doctor4.png",
-      name: "Dr Bouchra Rezig",
-      specialty: "Médecin nutritionniste",
-      description: "Accompagnement nutrition",
-    },
-  ];
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const { data, error } = await supabase
+        .from("doctor")
+        .select("*")
+        .eq("is_active", true) // only active doctors
+        .limit(4); // only first 4
+
+      if (error) {
+        console.error("Error fetching doctors:", error);
+      } else {
+        setDoctors(data);
+      }
+      setLoading(false);
+    };
+
+    fetchDoctors();
+  }, []);
+
+  if (loading) return <p>Loading doctors...</p>;
 
   return (
     <section style={{ padding: "4rem 2rem", textAlign: "center" }}>
@@ -49,12 +48,12 @@ export default function DoctorsSection() {
           marginTop: "3rem",
         }}
       >
-        {doctorsData.map((doc, index) => (
+        {doctors.map((doc) => (
           <DoctorCard
-            key={index}
-            photo={doc.photo}
+            key={doc.doctor_id}
+            photo={doc.profile_picture || "/home/doctor.png"} // fallback image
             name={doc.name}
-            specialty={doc.specialty}
+            specialty={doc.specialty_name}
             description={doc.description}
           />
         ))}
