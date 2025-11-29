@@ -1,82 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Clock, Edit, Trash2, UserPlus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserPlus } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import DoctorCard from '@/components/ui/doctor_card';
+
+// Modals
+import AddDoctorModal from '@/components/modals/AddDoctorModal';
+import EditDoctorModal from '@/components/modals/EditDoctorModal';
+import ScheduleManagementModal from '@/components/modals/ScheduleManagementModal';
 
 export default function Doctors() {
   const [doctors, setDoctors] = useState([
-    {
-      id: 1,
-      name: 'Dr Nadir Kedji',
-      specialty: 'Gynécologue obstétricien',
-      photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop',
-      description: "Gynécologue obstétricien, avec plus de 20 ans d'expertise en PMA. Expert dans les techniques de reproduction assistée et le suivi personnalisé des couples.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {
-        Lundi: { start: '09:00', end: '17:00' },
-        Mardi: { start: '09:00', end: '17:00' },
-        Mercredi: { start: '09:00', end: '17:00' },
-        Jeudi: { start: '09:00', end: '17:00' },
-        Vendredi: { start: '09:00', end: '14:00' }
-      }
-    },
-    {
-      id: 2,
-      name: 'Dr Sadat Nesrine',
-      specialty: 'Médecin de la reproduction',
-      photo: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop',
-      description: "Spécialiste en médecine reproductive avec une approche bienveillante et personnalisée. Expérience approfondie dans le traitement de l'infertilité.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {
-        Lundi: { start: '08:00', end: '16:00' },
-        Mardi: { start: '08:00', end: '16:00' },
-        Mercredi: { start: '08:00', end: '16:00' },
-        Jeudi: { start: '08:00', end: '16:00' },
-        Vendredi: { start: '08:00', end: '13:00' }
-      }
-    },
-    {
-      id: 3,
-      name: 'Dr Selmane',
-      specialty: 'Spécialiste en fertilité',
-      photo: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop',
-      description: "Expert en fertilité et techniques de PMA. Accompagne les couples avec dévouement et professionnalisme tout au long de leur parcours.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {
-        Lundi: { start: '10:00', end: '18:00' },
-        Mardi: { start: '10:00', end: '18:00' },
-        Mercredi: { start: '10:00', end: '18:00' },
-        Jeudi: { start: '10:00', end: '18:00' },
-        Vendredi: { start: '10:00', end: '15:00' }
-      }
-    },
-    {
-      id: 4,
-      name: 'Pr Mourad Semrouni',
-      specialty: 'Professeur en médecine reproductive',
-      photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&sat=-100',
-      description: "Gynécologue obstétricien, avec plus de 20 ans d'expertise en PMA. Expert dans les techniques de reproduction assistée et le suivi personnalisé des couples.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {}
-    },
-    {
-      id: 5,
-      name: 'Dr Bouchra Rezig',
-      specialty: 'Spécialiste en médecine reproductive',
-      photo: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop',
-      description: "Spécialiste en médecine reproductive avec une approche bienveillante et personnalisée. Expérience approfondie dans le traitement de l'infertilité.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {}
-    },
-    {
-      id: 6,
-      name: 'Mme Samia Yaker',
-      specialty: 'Infirmière spécialisée',
-      photo: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=400&fit=crop',
-      description: "Expert en fertilité et techniques de PMA. Accompagne les couples avec dévouement et professionnalisme tout au long de leur parcours.",
-      workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-      schedule: {}
-    }
   ]);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -85,48 +20,139 @@ export default function Doctors() {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    specialty: '',
-    photo: '',
-    description: ''
+    specialty_name: '',
+    profile_picture: '',
+    description: '',
+    email: '',
+    is_active: true
   });
-  //supabase data loading
+  //supabase data loading: fetch doctors and their schedules, then merge
+  const fetchDoctors = async () => {
+    const { data: doctorsData, error: doctorsError } = await supabase().from('doctor').select('*');
+    const { data: schedulesData, error: schedulesError } = await supabase().from('doctor_schedule').select('*');
 
-  const handleAddDoctor = () => {
-    if (formData.name && formData.specialty) {
-      const newDoctor = {
-        id: doctors.length + 1,
-        ...formData,
-        workDays: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi',
-        schedule: {}
-      };
-      setDoctors([...doctors, newDoctor]);
-      setFormData({ name: '', specialty: '', photo: '', description: '' });
-      setShowAddModal(false);
+    if (doctorsError) {
+      console.error('Error fetching doctors:', doctorsError);
+      return;
+    }
+    if (schedulesError) {
+      console.error('Error fetching schedules:', schedulesError);
+      // we'll continue and attach empty schedules if schedules fail
+    }
+
+    // map numeric day_of_week -> French day names (assumes 1 = Lundi)
+    const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi',];
+
+    // build schedule map by doctor_id
+    const scheduleMap = {};
+    (schedulesData || []).forEach((s) => {
+      const did = s.doctor_id;
+      const idx = Number(s.day_of_week);
+      const dayName = dayNames[idx] || String(s.day_of_week);
+      // format time to HH:MM if present (supabase time may be '09:00:00')
+      const formatTime = (t) => (t ? String(t).substring(0, 5) : '');
+      const start = formatTime(s.start_time);
+      const end = formatTime(s.end_time);
+      if (!scheduleMap[did]) scheduleMap[did] = {};
+      scheduleMap[did][dayName] = { start, end };
+    });
+
+    const merged = (doctorsData || []).map((d) => ({
+      ...d,
+      // attach schedule object or empty object
+      schedule: scheduleMap[d.doctor_id] || {},
+      workDays: scheduleMap[d.doctor_id]
+        ? Object.keys(scheduleMap[d.doctor_id]).join(', ')
+        : 'Aucun jour de travail défini'
+    }));
+
+    setDoctors(merged);
+    console.log('Doctors with schedules:', merged);
+  }
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const handleAddDoctor = async () => {
+    if (formData.name && formData.specialty_name) {
+      try {
+        const toInsert = {
+          name: formData.name,
+          specialty_name: formData.specialty_name,
+          profile_picture: formData.profile_picture || null,
+          description: formData.description || null,
+          email: formData.email || null,
+          is_active: Boolean(formData.is_active)
+        };
+        const { data: inserted, error: insertError } = await supabase().from('doctor').insert(toInsert).select().single();
+        if (insertError) {
+          console.error('Error inserting doctor:', insertError);
+          return;
+        }
+        const newDoctor = { ...inserted, schedule: {}, workDays: '' };
+        setDoctors((prev) => [...prev, newDoctor]);
+        setFormData({ name: '', specialty_name: '', profile_picture: '', description: '', email: '', is_active: true });
+        setShowAddModal(false);
+      } catch (err) {
+        console.error('handleAddDoctor error:', err);
+      }
     }
   };
 
-  const handleEditDoctor = () => {
-    if (formData.name && formData.specialty) {
-      setDoctors(doctors.map(doc => 
-        doc.id === selectedDoctor.id ? { ...doc, ...formData } : doc
-      ));
-      setFormData({ name: '', specialty: '', photo: '', description: '' });
-      setShowEditModal(false);
-      setSelectedDoctor(null);
+  const handleEditDoctor = async () => {
+    if (formData.name && formData.specialty_name && selectedDoctor) {
+      try {
+        const updates = {
+          name: formData.name,
+          specialty_name: formData.specialty_name,
+          profile_picture: formData.profile_picture || null,
+          description: formData.description || null,
+          email: formData.email || null,
+          is_active: Boolean(formData.is_active)
+        };
+        const { data: updated, error: updateError } = await supabase().from('doctor').update(updates).eq('doctor_id', selectedDoctor.doctor_id).select().single();
+        if (updateError) {
+          console.error('Error updating doctor:', updateError);
+          return;
+        }
+        setDoctors((prev) => prev.map((doc) => (doc.doctor_id === updated.doctor_id ? { ...doc, ...updated } : doc)));
+        setFormData({ name: '', specialty_name: '', profile_picture: '', description: '', email: '', is_active: true });
+        setShowEditModal(false);
+        setSelectedDoctor(null);
+      } catch (err) {
+        console.error('handleEditDoctor error:', err);
+      }
     }
   };
 
-  const handleDeleteDoctor = (id) => {
-    setDoctors(doctors.filter(doc => doc.id !== id));
+  const handleDeleteDoctor = (doctor_id) => {
+    (async () => {
+      try {
+        // delete schedules first
+        const { error: delSchedulesError } = await supabase().from('doctor_schedule').delete().eq('doctor_id', doctor_id);
+        if (delSchedulesError) console.error('Error deleting schedules:', delSchedulesError);
+        // delete doctor
+        const { error: delError } = await supabase().from('doctor').delete().eq('doctor_id', doctor_id);
+        if (delError) {
+          console.error('Error deleting doctor:', delError);
+          return;
+        }
+        setDoctors((prev) => prev.filter((doc) => doc.doctor_id !== doctor_id));
+      } catch (err) {
+        console.error('handleDeleteDoctor error:', err);
+      }
+    })();
   };
 
   const openEditModal = (doctor) => {
     setSelectedDoctor(doctor);
     setFormData({
       name: doctor.name,
-      specialty: doctor.specialty,
-      photo: doctor.photo,
-      description: doctor.description
+      specialty_name: doctor.specialty_name,
+      profile_picture: doctor.profile_picture,
+      description: doctor.description,
+      email: doctor.email || '',
+      is_active: doctor.is_active ?? true
     });
     setShowEditModal(true);
   };
@@ -134,6 +160,69 @@ export default function Doctors() {
   const openScheduleModal = (doctor) => {
     setSelectedDoctor(doctor);
     setShowScheduleModal(true);
+  };
+
+  const handleScheduleChange = (day, field, value) => {
+    setSelectedDoctor((prev) => {
+      if (!prev) return prev;
+      const prevSchedule = prev.schedule || {};
+      return {
+        ...prev,
+        schedule: {
+          ...prevSchedule,
+          [day]: {
+            ...(prevSchedule[day] || {}),
+            [field]: value
+          }
+        }
+      };
+    });
+  };
+
+  const saveSchedule = async () => {
+    if (!selectedDoctor) return;
+    const doctorId = selectedDoctor.doctor_id;
+    const schedule = selectedDoctor.schedule || {};
+
+    // map French day names to numeric day_of_week (1 = Lundi)
+    const dayToIdx = { Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 7 };
+
+    try {
+      // remove existing schedules for this doctor
+      const { error: delError } = await supabase().from('doctor_schedule').delete().eq('doctor_id', doctorId);
+      if (delError) console.error('Error deleting existing schedules:', delError);
+
+      // prepare inserts
+      const inserts = [];
+      Object.entries(schedule).forEach(([day, times]) => {
+        const start = times?.start?.trim();
+        const end = times?.end?.trim();
+        // skip empty entries
+        if (!start && !end) return;
+        const formatTime = (t) => (t ? (t.length === 5 ? `${t}:00` : t) : null);
+        inserts.push({
+          doctor_id: doctorId,
+          day_of_week: dayToIdx[day] || null,
+          start_time: formatTime(start),
+          end_time: formatTime(end)
+        });
+      });
+
+      if (inserts.length > 0) {
+        const { data: inserted, error: insertError } = await supabase().from('doctor_schedule').insert(inserts);
+        if (insertError) {
+          console.error('Error inserting schedules:', insertError);
+        } else {
+          console.log('Inserted schedules:', inserted);
+        }
+      }
+
+      // update local state
+      setDoctors((prev) => prev.map((d) => (d.doctor_id === doctorId ? selectedDoctor : d)));
+      setShowScheduleModal(false);
+    } catch (err) {
+      console.error('saveSchedule error:', err);
+    }
   };
 
   return (
@@ -159,274 +248,24 @@ export default function Doctors() {
         {/* Doctors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {doctors.map((doctor) => (
-            <div key={doctor.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition">
-              {/* Doctor Photo */}
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <img
-                    src={doctor.photo}
-                    alt={doctor.name}
-                    className="w-32 h-32 rounded-full object-cover"
-                  />
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full"></div>
-                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                </div>
-              </div>
-
-              {/* Doctor Info */}
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{doctor.name}</h3>
-                <p className="text-yellow-600 font-medium text-sm mb-3">{doctor.specialty}</p>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4">{doctor.description}</p>
-                
-                {/* Work Days */}
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-700 mb-4">
-                  <Clock size={16} />
-                  <span>Jours de travail:</span>
-                </div>
-                <p className="text-sm text-gray-600">{doctor.workDays}</p>
-              </div>
-
-              {/* Actions */}
-              <div className="space-y-2">
-                <button
-                  onClick={() => openScheduleModal(doctor)}
-                  className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <Clock size={16} />
-                  Gérer les horaires
-                </button>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openEditModal(doctor)}
-                    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-                  >
-                    <Edit size={16} />
-                    Modifier
-                  </button>
-                  <button
-                    onClick={() => handleDeleteDoctor(doctor.id)}
-                    className="flex-1 flex items-center justify-center gap-2 border border-red-300 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition"
-                  >
-                    <Trash2 size={16} />
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            </div>
+            <DoctorCard key={doctor.doctor_id} handleDeleteDoctor={handleDeleteDoctor} openEditModal={openEditModal} openScheduleModal={openScheduleModal} doctor={doctor}></DoctorCard>
           ))}
         </div>
       </div>
 
       {/* Add Doctor Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Ajouter un nouveau médecin</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Spécialité</label>
-                <input
-                  type="text"
-                  value={formData.specialty}
-                  onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL de la photo de profil</label>
-                <input
-                  type="text"
-                  value={formData.photo}
-                  onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-            </div>
-            
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleAddDoctor}
-                className="flex-1 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
-              >
-                Ajouter
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddDoctorModal setShowAddModal={setShowAddModal} formData={formData} setFormData={setFormData} handleAddDoctor={handleAddDoctor}></AddDoctorModal>
       )}
 
       {/* Edit Doctor Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Modifier le médecin</h2>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Spécialité</label>
-                <input
-                  type="text"
-                  value={formData.specialty}
-                  onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL de la photo de profil</label>
-                <input
-                  type="text"
-                  value={formData.photo}
-                  onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
-            </div>
-            
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleEditDoctor}
-                className="flex-1 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
-              >
-                Enregistrer
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditDoctorModal setShowEditModal={setShowEditModal} formData={formData} setFormData={setFormData} handleEditDoctor={handleEditDoctor}></EditDoctorModal>
       )}
 
       {/* Schedule Management Modal */}
       {showScheduleModal && selectedDoctor && (
-        <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Gérer les horaires - {selectedDoctor.name}</h2>
-              <button onClick={() => setShowScheduleModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => (
-                <div key={day}>
-                  <h3 className="font-medium text-gray-900 mb-3">{day}</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">Heure de début</label>
-                      <select
-                        defaultValue={selectedDoctor.schedule[day]?.start || ''}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      >
-                        <option value="">Sélectionner</option>
-                        {Array.from({ length: 48 }, (_, i) => {
-                          const hour = Math.floor(i / 2);
-                          const minute = i % 2 === 0 ? '00' : '30';
-                          const time = `${hour.toString().padStart(2, '0')}:${minute}`;
-                          return <option key={time} value={time}>{time}</option>;
-                        })}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-600 mb-1">Heure de fin</label>
-                      <select
-                        defaultValue={selectedDoctor.schedule[day]?.end || ''}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      >
-                        <option value="">Sélectionner</option>
-                        {Array.from({ length: 48 }, (_, i) => {
-                          const hour = Math.floor(i / 2);
-                          const minute = i % 2 === 0 ? '00' : '30';
-                          const time = `${hour.toString().padStart(2, '0')}:${minute}`;
-                          return <option key={time} value={time}>{time}</option>;
-                        })}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowScheduleModal(false)}
-                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={() => setShowScheduleModal(false)}
-                className="flex-1 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
-              >
-                Enregistrer
-              </button>
-            </div>
-          </div>
-        </div>
+        <ScheduleManagementModal setShowScheduleModal={setShowScheduleModal} selectedDoctor={selectedDoctor} setSelectedDoctor={setSelectedDoctor} handleScheduleChange={handleScheduleChange} saveSchedule={saveSchedule}></ScheduleManagementModal>
       )}
     </div>
   );
