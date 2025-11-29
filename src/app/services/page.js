@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+
 
 // Dummy data for localhost
 /*const services = [
@@ -9,7 +11,7 @@ import Link from "next/link";
 
 const supabase = await createClient();
 
-const { data: service, error } = await supabase
+const { data: services, error } = await supabase
     .from("service")
     .select("*")
 

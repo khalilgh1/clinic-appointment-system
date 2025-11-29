@@ -1,6 +1,8 @@
 import ServiceTemplate from "@/components/layout/serviceTemplate";
 import { createClient } from "@/lib/supabase/server";
 
+
+
 export default async function Page({ params }) {
   // ⬅️ FIX: params is a Promise
   const resolved = await params;
