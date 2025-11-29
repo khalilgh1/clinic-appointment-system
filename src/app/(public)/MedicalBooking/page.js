@@ -47,8 +47,8 @@ const BookingFlow = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0">
-        <div className="max-w-5xl mx-auto">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0 no-scrollbar"> 
+        <div className="max-w-5xl mx-auto  no-scrollbar">
 
           {showFinalization ? (
             <Finalization onReturnHome={handleReturnHome} />

@@ -55,8 +55,8 @@ const Step1Service = ({ onNext }) => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+    <div className="h-auto overflow-auto no-scrollbar">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 ">
         Sélectionnez un service
       </h1>
 
