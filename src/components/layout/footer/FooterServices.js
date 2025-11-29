@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import {supabase} from '@/lib/supabase/client';
 
 export default function FooterServices() {
   const [services, setServices] = React.useState([]);
@@ -11,7 +11,7 @@ export default function FooterServices() {
   React.useEffect(() => {
     async function fetchServices() {
       try {
-        const supabase = createClient();
+        const supabase = supabase();
         const { data, error } = await supabase
           .from('service')
           .select('service_id, name')
