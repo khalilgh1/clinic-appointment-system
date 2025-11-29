@@ -17,7 +17,7 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
   React.useEffect(() => {
     async function fetchServices() {
       try {
-        const supabase = supabase();
+        const supabase = createClient();
         const { data, error } = await supabase
           .from('service')
           .select('service_id, name')

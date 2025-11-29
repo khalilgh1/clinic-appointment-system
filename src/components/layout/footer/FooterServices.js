@@ -11,7 +11,7 @@ export default function FooterServices() {
   React.useEffect(() => {
     async function fetchServices() {
       try {
-        const supabase = supabase();
+        const supabase = createClient();
         const { data, error } = await supabase
           .from('service')
           .select('service_id, name')
