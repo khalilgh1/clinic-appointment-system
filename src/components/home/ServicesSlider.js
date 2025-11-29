@@ -39,7 +39,7 @@ export default function ServicesSlider() {
 
   useEffect(() => {
     const fetchServices = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase()
         .from("service")
         .select("*")
         .eq("is_active", true);

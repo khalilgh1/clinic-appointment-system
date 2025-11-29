@@ -12,7 +12,7 @@ export default function DoctorsSection() {
 
   useEffect(() => {
     const fetchDoctors = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase()
         .from("doctor")
         .select("*")
         .eq("is_active", true) // only active doctors
