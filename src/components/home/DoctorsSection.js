@@ -51,7 +51,7 @@ export default function DoctorsSection() {
         {doctors.map((doc) => (
           <DoctorCard
             key={doc.doctor_id}
-            photo={doc.profile_picture || "/home/doctor.png"} // fallback image
+            photo={doc.profile_picture || "/doctor.png"} // fallback image
             name={doc.name}
             specialty={doc.specialty_name}
             description={doc.description}

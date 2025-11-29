@@ -80,7 +80,7 @@ export default function HomeHero() {
         {/* Right image */}
         <div style={{ flex: 1 }}>
           <img
-            src="/home/doctor.png"
+            src="/doctor.png"
             alt="Doctor"
             style={{
               width: '100%',
