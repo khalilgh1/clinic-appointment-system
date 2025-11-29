@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
-import Step2Doctor from "./Step2Doctor";
-import Step1Service from "./Step1Service";
-import Step3Schedule from "./Step3Schedule";
-import Step4Info from "./Step4Info";
-import Finalization from './Finalization';
+import Sidebar from "@/components/ui/BookingPage/Sidebar";
+import Step2Doctor from "@/components/ui/BookingPage/Step2Doctor";
+import Step1Service from "@/components/ui/BookingPage/Step1Service";
+import Step3Schedule from "@/components/ui/BookingPage/Step3Schedule";
+import Step4Info from "@/components/ui/BookingPage/Step4Info";
+import Finalization from '@/components/ui/BookingPage/Finalization';
 import { BookingProvider } from "@/context/BookingContext"; 
 
 // Composant interne qui utilise le contexte

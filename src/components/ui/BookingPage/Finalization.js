@@ -146,10 +146,7 @@ const Finalization = ({ onReturnHome }) => {
         </button>
       </div>
 
-      {/* Numéro d'urgence */}
-      <div className="text-center mt-8 text-sm text-gray-500">
-        <p>Besoin d'aide ? Contactez-nous au <strong>+213 XXX XX XX XX</strong></p>
-      </div>
+      
     </div>
   );
 };

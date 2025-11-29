@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import { useDoctors } from '../../../hooks/useDoctors';
-import { useBooking } from '../../../context/BookingContext';
-import DoctorCard from '../../../components/ui/DoctorCard';
+import { useDoctors } from '@/hooks/useDoctors';
+import { useBooking } from '@/context/BookingContext';
+import DoctorCard from '../DoctorCard';
 
 const Step2Doctor = ({ onNext, onBack }) => {
   const { state, dispatch } = useBooking();
