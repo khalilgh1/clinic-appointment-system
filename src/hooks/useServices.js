@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { createClient } from '../lib/supabase/client'; 
+import { supabase as createSupabaseClient } from '../lib/supabase/client'; 
 
 export const useServices = () => {
   const [services, setServices] = useState([]);
@@ -16,7 +16,7 @@ export const useServices = () => {
         setError(null);
         setUsingFallback(false);
 
-        const supabase = createClient();
+        const supabase = createSupabaseClient();
         
         console.log('🔍 Fetching services from Supabase...');
 

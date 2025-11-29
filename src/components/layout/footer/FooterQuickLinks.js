@@ -4,8 +4,8 @@ export default function FooterQuickLinks() {
   const quickLinks = [
     { name: 'Accueil', href: '/' },
     { name: 'À propos de nous', href: '/about' },
-    { name: 'Médecins', href: '/medecins' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Médecins', href: '/Doctor' },
+    { name: 'Services', href: '/services' },
   ];
 
   return (

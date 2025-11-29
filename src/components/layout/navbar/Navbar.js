@@ -50,10 +50,10 @@ export default function Navbar({ currentPath = '/' }) {
           <div className="flex items-center gap-4">
             {/* Desktop CTA Button */}
             <Link
-              href="/appointment"
+              href="/MedicalBooking"
               className="hidden lg:flex px-8 xl:px-10 py-4 rounded-full font-semibold items-center justify-center gap-4 bg-primary text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
             >
-              <span className="text-lg xl:text-xl whitespace-nowrap flex items-center">
+                <span className="text-lg xl:text-xl whitespace-nowrap flex items-center">
                 Prendre Rendez-Vous
               </span>
               <div className="w-8 h-8 rounded-full bg-white backdrop-blur-sm flex items-center justify-center transition-transform group-hover:translate-x-1">
@@ -94,7 +94,7 @@ export default function Navbar({ currentPath = '/' }) {
                 </Link>
                 <div className="px-6 py-4 mt-2">
                   <Link
-                    href="/appointment"
+                    href="/MedicalBooking"
                     className="block w-full text-center px-6 py-4 rounded-full font-medium transition-all duration-300 flex items-center justify-center gap-3 text-base bg-[var(--color-primary)] text-white hover:bg-[var(--color-secondary-light)] hover:shadow-lg hover:scale-[1.02] active:scale-95"
                   >
                     <span className="flex items-center">Prendre Rendez-Vous</span>
