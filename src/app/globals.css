@@ -13,6 +13,7 @@ body {
   --color-secondary-dark: #9BB3B5;
   --color-secondary-light: #707677;
   --color-bg-primary: #F5F7F8;
+  --color-text-secondary: #064045;
   
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -22,4 +23,53 @@ body {
 :root {
   font-size: 62.5%;
   font-family: 'Roboto', sans-serif;
+
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
 }
