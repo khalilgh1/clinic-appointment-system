@@ -1,39 +1,39 @@
 import ServiceTemplate from "@/components/layout/serviceTemplate";
-
-const services = [
-  {
-    service_id: 1,
-    name: "General Consultation",
-    description: "Comprehensive medical exam",
-    equipments: ["Stethoscope", "Blood Pressure Monitor"],
-    exams: ["Vital Signs Check"],
-    procedures: ["Patient interview", "Physical exam"],
-    advantages: ["Quick diagnosis", "Personalized treatment"],
-    price: 5000,
-    duration_min: 30,
-  },
-  {
-    service_id: 2,
-    name: "Blood Test",
-    description: "Basic blood analysis",
-    equipments: ["Needle", "Test Tubes"],
-    exams: ["Blood Draw"],
-    procedures: ["Draw blood", "Lab analysis"],
-    advantages: ["Fast results"],
-    price: 2000,
-    duration_min: 15,
-  },
-];
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Page({ params }) {
-  const resolvedParams = await params; 
-  const id = Number(resolvedParams.id);
+  // ⬅️ FIX: params is a Promise
+  const resolved = await params;
+  const numericId = Number(resolved.id);
 
-  if (isNaN(id)) return <div className="p-6 text-red-500">Invalid service ID</div>;
+  if (isNaN(numericId)) {
+    return <div className="p-6 text-red-500">Invalid service ID</div>;
+  }
 
-  const service = services.find((s) => s.service_id === id);
+  const supabase = await createClient();
 
-  if (!service) return <div className="p-6 text-red-500">Service not found</div>;
+  const { data: service, error } = await supabase
+    .from("service")
+    .select("*")
+    .eq("service_id", numericId)
+    .single();
+
+  if (error || !service) {
+    console.error("Supabase fetch error:", error);
+    return <div className="p-6 text-red-500">Service not found</div>;
+  }
+
+  // Parse JSON string → array
+  const jsonFields = ["exams", "equipments", "advantages", "procedures"];
+  for (const key of jsonFields) {
+    if (service[key]) {
+      try {
+        service[key] = JSON.parse(service[key]);
+      } catch (err) {
+        console.error("JSON parse error on", key, err);
+      }
+    }
+  }
 
   return <ServiceTemplate service={service} />;
 }

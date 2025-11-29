@@ -1,11 +1,19 @@
 import Link from "next/link";
 
 // Dummy data for localhost
-const services = [
+/*const services = [
   { service_id: 1, name: "General Consultation" },
   { service_id: 2, name: "Blood Test" },
   { service_id: 3, name: "X-Ray" },
-];
+];*/
+
+const supabase = await createClient();
+
+const { data: service, error } = await supabase
+    .from("service")
+    .select("*")
+
+
 
 export default function ServicesPage() {
   return (
