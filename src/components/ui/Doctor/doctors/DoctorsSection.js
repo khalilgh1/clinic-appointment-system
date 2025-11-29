@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import DoctorCard from './DoctorCard';
 
 const DoctorsSection = async () => {
-  const supabase = await createClient();
+  const supabase = await supabase();
   
   // Fetch doctors from Supabase
   const { data: doctors, error } = await supabase
