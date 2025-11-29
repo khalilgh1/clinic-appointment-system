@@ -21,7 +21,7 @@ const CTASection = () => {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
-              href="/booking"
+              href="/MedicalBooking"
               className="bg-secondary text-primary px-8 py-3 rounded-full text-sm md:text-base font-semibold shadow-md transition-all duration-300 hover:scale-105"
             >
               Prendre Rendez-Vous
