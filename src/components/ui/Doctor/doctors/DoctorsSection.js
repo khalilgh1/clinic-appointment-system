@@ -1,11 +1,10 @@
 // components/ui/Doctor/DoctorsSection.js
 import React from 'react';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import DoctorCard from './DoctorCard';
-import supabase from '@/lib/supabase/client';
 
 const DoctorsSection = async () => {
-  const supabase = await supabase();
+  const supabase = await createClient();
   
   // Fetch doctors from Supabase
   const { data: doctors, error } = await supabase

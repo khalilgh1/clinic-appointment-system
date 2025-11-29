@@ -4,7 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
+import { supabase as createSupabaseClient } from '@/lib/supabase/client';
 
 export default function ServicesDropdown({ isMobile = false, isActive = false }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -17,7 +17,7 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
   React.useEffect(() => {
     async function fetchServices() {
       try {
-        const supabase = supabase();
+        const supabase = createSupabaseClient();
         const { data, error } = await supabase
           .from('service')
           .select('service_id, name')
