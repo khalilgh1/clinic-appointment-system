@@ -2,12 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 
-// Dummy data for localhost
-/*const services = [
-  { service_id: 1, name: "General Consultation" },
-  { service_id: 2, name: "Blood Test" },
-  { service_id: 3, name: "X-Ray" },
-];*/
+
 
 const supabase = await createClient();
 

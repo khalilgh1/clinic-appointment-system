@@ -25,7 +25,7 @@ export default async function Page({ params }) {
     return <div className="p-6 text-red-500">Service not found</div>;
   }
 
-  // Parse JSON string → array
+  // parse
   const jsonFields = ["exams", "equipments", "advantages", "procedures"];
   for (const key of jsonFields) {
     if (service[key]) {
