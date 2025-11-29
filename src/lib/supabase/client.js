@@ -1,5 +1,5 @@
-//supabase initialization here
-import { createBrowserClient } from '@supabase/ssr'
+// src/lib/supabase/client.js
+import { createClient } from '@supabase/supabase-js';
 
 export function supabase() {
   return createBrowserClient(
