@@ -3,54 +3,111 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Home } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
+import { supabase as createSupabaseClient } from '@/lib/supabase/client';
 
 const Finalization = ({ onReturnHome }) => {
   const { state, dispatch } = useBooking();
   const [status, setStatus] = useState('loading'); // 'loading', 'success', 'error'
   const [errorMessage, setErrorMessage] = useState('');
-  const [hasSubmitted, setHasSubmitted] = useState(false); // Nouvel état pour éviter les re-soumissions
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  // Simulation de l'envoi des données au backend - CORRIGÉ
+  // Step 6: Submit appointment to database
   useEffect(() => {
-    // Éviter de soumettre plusieurs fois
     if (hasSubmitted) return;
 
     const submitAppointment = async () => {
       try {
         setStatus('loading');
         setHasSubmitted(true);
-        
-        // Simulation d'un délai d'envoi (2 secondes)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Simulation d'une réussite (90% de chance) ou échec (10% de chance)
-        const isSuccess = Math.random() > 0.1;
-        
-        if (isSuccess) {
-          setStatus('success');
-          
-          // Ici, vous enverrez les vraies données au backend :
-          // await apiService.createAppointment({
-          //   service: state.selectedService,
-          //   doctor: state.selectedDoctor,
-          //   dateTime: state.selectedDateTime,
-          //   patientInfo: state.patientInfo
-          // });
-          
-        } else {
-          setStatus('error');
-          setErrorMessage('Erreur de connexion au serveur. Veuillez réessayer.');
+
+        // Validate required data
+        if (!state.selectedService || !state.selectedDoctor || !state.selectedDateTime || !state.patientInfo) {
+          throw new Error('Données de réservation incomplètes');
         }
+
+        const supabase = createSupabaseClient();
+
+        // Get service duration
+        const { data: service, error: serviceError } = await supabase
+          .from('service')
+          .select('duration_min')
+          .eq('service_id', state.selectedService.id)
+          .single();
+
+        if (serviceError || !service) {
+          throw new Error(`Erreur lors de la récupération du service: ${serviceError?.message || 'Service introuvable'}`);
+        }
+
+        const durationMin = service.duration_min || 30;
+
+        // Parse selected date and time
+        const selectedDate = state.selectedDateTime.date;
+        const [hours, minutes] = state.selectedDateTime.time.split(':').map(Number);
+        
+        // Create start_time timestamp
+        const startTime = new Date(selectedDate);
+        startTime.setHours(hours, minutes, 0, 0);
+        
+        // Calculate end_time
+        const endTime = new Date(startTime);
+        endTime.setMinutes(endTime.getMinutes() + durationMin);
+
+        // Step 6: Check slot availability again before insertion
+        // Check for overlapping appointments: start_time < new_end_time AND end_time > new_start_time
+        const { data: conflictingAppointments, error: checkError } = await supabase
+          .from('appointment')
+          .select('appointment_id')
+          .eq('doctor_id', state.selectedDoctor.id)
+          .lt('start_time', endTime.toISOString())
+          .gt('end_time', startTime.toISOString());
+
+        if (checkError) {
+          throw new Error(`Erreur lors de la vérification de disponibilité: ${checkError.message}`);
+        }
+
+        if (conflictingAppointments && conflictingAppointments.length > 0) {
+          throw new Error('Ce créneau n\'est plus disponible. Veuillez choisir un autre horaire.');
+        }
+
+        // Insert appointment into database
+        const { data: appointment, error: insertError } = await supabase
+          .from('appointment')
+          .insert({
+            patient_first_name: state.patientInfo.prenom,
+            patient_last_name: state.patientInfo.nom,
+            patient_email: state.patientInfo.email,
+            patient_phone: state.patientInfo.telephone,
+            doctor_id: state.selectedDoctor.id,
+            service_id: state.selectedService.id,
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
+            status: 'pending'
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          throw new Error(`Erreur lors de la création du rendez-vous: ${insertError.message}`);
+        }
+
+        setStatus('success');
+        
+        // Reset booking state after successful submission
+        setTimeout(() => {
+          dispatch({ type: 'RESET_BOOKING' });
+        }, 3000);
         
       } catch (error) {
         setStatus('error');
-        setErrorMessage('Une erreur inattendue est survenue. Veuillez contacter le support.');
+        setErrorMessage(error.message || 'Une erreur inattendue est survenue. Veuillez contacter le support.');
         console.error('Erreur lors de la réservation:', error);
+        setHasSubmitted(false); // Allow retry
       }
     };
 
     submitAppointment();
-  }, [hasSubmitted]); // Dépendance uniquement sur hasSubmitted
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSubmitted]);
 
   // Animation de succès
   const SuccessAnimation = () => (

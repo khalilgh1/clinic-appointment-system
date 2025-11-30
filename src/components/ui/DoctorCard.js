@@ -33,7 +33,22 @@ const DoctorCard = ({ doctor, isSelected, onClick }) => {
     >
       <div className="flex items-start gap-4 mb-4">
         {/* profile picture */}
-        <div className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-semibold text-lg ${getColorFromName(name)}`}>
+        {doctor.profilePicture ? (
+           <img 
+             src={doctor.profilePicture} 
+             alt={name} 
+             className="flex-shrink-0 w-16 h-16 rounded-full object-cover border border-gray-100"
+             onError={(e) => {
+               e.target.style.display = 'none';
+               e.target.nextSibling.style.display = 'flex'; // Show fallback if image fails
+             }}
+           />
+        ) : null}
+        
+        <div 
+          className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-semibold text-lg ${getColorFromName(name)}`}
+          style={{ display: doctor.profilePicture ? 'none' : 'flex' }}
+        >
           {getInitials(name)}
         </div>
         
@@ -54,4 +69,4 @@ const DoctorCard = ({ doctor, isSelected, onClick }) => {
   );
 };
 
-export default DoctorCard; // EXPORT 
+export default DoctorCard;

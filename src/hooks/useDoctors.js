@@ -1,53 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-
-// Données mockées temporaires - PAS d'appel HTTP
-const mockDoctors = [
-  { 
-    id: 1,
-    name: "Dr Nadir Kedji", 
-    specialty: "Gynécologue obstétricien", 
-    description: "Expert PMA (20+ ans)", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 2,
-    name: "Dr Sadat Nesrine", 
-    specialty: "Spécialiste en fertilité", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 3,
-    name: "Dr. Selmane", 
-    specialty: "Spécialiste en fertilité", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 4,
-    name: "Pr Mourad Semrouni", 
-    specialty: "Endocrinologue dialektologue", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 5,
-    name: "Dr Bouchra Rezig", 
-    specialty: "Médecin nutritionniste", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 6,
-    name: "Mme Samia Yaker", 
-    specialty: "Biologiste de la reproduction", 
-    email: "contact@ferival.dz" 
-  },
-  { 
-    id: 7,
-    name: "Mme Sabrina Ferrane", 
-    specialty: "Embryologiste", 
-    email: "contact@ferival.dz" 
-  }
-];
+import { supabase as createSupabaseClient } from '../lib/supabase/client';
 
 export const useDoctors = (serviceId = null) => {
   const [doctors, setDoctors] = useState([]);
@@ -58,20 +12,62 @@ export const useDoctors = (serviceId = null) => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
-        // SIMULATION sans appel HTTP - utiliser les données mockées directement
-        await new Promise(resolve => setTimeout(resolve, 500)); // Petit délai pour l'UX
-        
-        // Filtrer par service si nécessaire (pour plus tard)
-        let filteredDoctors = mockDoctors;
-        if (serviceId) {
-          // Ici vous pourrez filtrer les médecins par service quand le backend sera prêt
-          filteredDoctors = mockDoctors;
+        setError(null);
+
+        if (!serviceId) {
+          setDoctors([]);
+          setLoading(false);
+          return;
         }
-        
-        setDoctors(filteredDoctors);
+
+        const supabase = createSupabaseClient();
+
+        // Step 2: Query DoctorServices to find doctors who provide the selected service
+        // Then filter only active doctors
+        const { data: doctorServices, error: doctorServicesError } = await supabase
+          .from('doctor_services')
+          .select('doctor_id')
+          .eq('service_id', serviceId);
+
+        if (doctorServicesError) {
+          throw new Error(`Erreur lors de la récupération des médecins: ${doctorServicesError.message}`);
+        }
+
+        if (!doctorServices || doctorServices.length === 0) {
+          setDoctors([]);
+          setLoading(false);
+          return;
+        }
+
+        // Get unique doctor IDs
+        const doctorIds = [...new Set(doctorServices.map(ds => ds.doctor_id))];
+
+        // Query Doctor table for active doctors
+        const { data: doctorsData, error: doctorsError } = await supabase
+          .from('doctor')
+          .select('doctor_id, name, email, description, profile_picture, specialty_name')
+          .in('doctor_id', doctorIds)
+          .eq('is_active', true);
+
+        if (doctorsError) {
+          throw new Error(`Erreur lors de la récupération des médecins: ${doctorsError.message}`);
+        }
+
+        // Transform data to match frontend format
+        const transformedDoctors = (doctorsData || []).map(doctor => ({
+          id: doctor.doctor_id,
+          name: doctor.name,
+          specialty: doctor.specialty_name || '',
+          description: doctor.description || '',
+          email: doctor.email,
+          profilePicture: doctor.profile_picture
+        }));
+
+        setDoctors(transformedDoctors);
       } catch (err) {
         setError(err.message);
         console.error('Error in useDoctors:', err);
+        setDoctors([]);
       } finally {
         setLoading(false);
       }

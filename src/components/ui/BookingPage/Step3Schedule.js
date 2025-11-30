@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft, Calendar, Clock } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
+import { useAvailableDates } from '@/hooks/useAvailableDates';
+import { useAvailableSlots } from '@/hooks/useAvailableSlots';
 
 const Step3Schedule = ({ onNext, onBack }) => {
   const { state, dispatch } = useBooking();
@@ -10,17 +12,28 @@ const Step3Schedule = ({ onNext, onBack }) => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Dummy available dates and times
-  const availableDates = generateAvailableDates(30); // 30 going from today
-  const availableTimes = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-    '11:00', '11:30', '13:00', '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00', '16:30', '17:00'
-  ];
+  // Step 3: Generate available days using hooks
+  const { availableDates, loading: datesLoading, error: datesError } = useAvailableDates(
+    state.selectedDoctor?.id,
+    3 // 3 months ahead
+  );
+
+  // Step 4: Generate available slots for selected day
+  const { availableSlots, loading: slotsLoading, error: slotsError } = useAvailableSlots(
+    state.selectedDoctor?.id,
+    state.selectedService?.id,
+    selectedDate
+  );
 
   const handleDateSelect = (date) => {
-    setSelectedDate(date);
-    setSelectedTime(null); // Reset time when date changes
+    // Only allow selection if date is available
+    const isAvailable = availableDates.some(availableDate => 
+      availableDate.toDateString() === date.toDateString()
+    );
+    if (isAvailable) {
+      setSelectedDate(date);
+      setSelectedTime(null); // Reset time when date changes
+    }
   };
 
   const handleTimeSelect = (time) => {
@@ -51,11 +64,31 @@ const Step3Schedule = ({ onNext, onBack }) => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
 
+  if (datesError) {
+    return (
+      <div className="flex justify-center items-center py-12 flex-col">
+        <div className="text-red-500 text-center mb-4">{datesError}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
         Choisissez la date et l'heure
       </h1>
+
+      {datesLoading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-gray-500">Chargement des dates disponibles...</div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -82,12 +115,14 @@ const Step3Schedule = ({ onNext, onBack }) => {
             </div>
           </div>
 
-          <CalendarGrid
-            currentMonth={currentMonth}
-            availableDates={availableDates}
-            selectedDate={selectedDate}
-            onDateSelect={handleDateSelect}
-          />
+          {!datesLoading && (
+            <CalendarGrid
+              currentMonth={currentMonth}
+              availableDates={availableDates}
+              selectedDate={selectedDate}
+              onDateSelect={handleDateSelect}
+            />
+          )}
         </div>
 
         {/* Section hours */}
@@ -108,11 +143,25 @@ const Step3Schedule = ({ onNext, onBack }) => {
                 })}
               </p>
               
-              <TimeSlotsGrid
-                availableTimes={availableTimes}
-                selectedTime={selectedTime}
-                onTimeSelect={handleTimeSelect}
-              />
+              {slotsLoading ? (
+                <div className="text-center py-8 text-gray-500">
+                  Chargement des créneaux...
+                </div>
+              ) : slotsError ? (
+                <div className="text-center py-8 text-red-500">
+                  {slotsError}
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Aucun créneau disponible pour cette date
+                </div>
+              ) : (
+                <TimeSlotsGrid
+                  availableTimes={availableSlots}
+                  selectedTime={selectedTime}
+                  onTimeSelect={handleTimeSelect}
+                />
+              )}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
@@ -281,22 +330,5 @@ const TimeSlotsGrid = ({ availableTimes, selectedTime, onTimeSelect }) => {
   );
 };
 
-// generate available dates function (simulated)
-function generateAvailableDates(daysCount) {
-  const availableDates = [];
-  const today = new Date();
-  
-  for (let i = 0; i < daysCount; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    
-    // Simulate weekend 
-    if (date.getDay() !== 5 && date.getDay() !== 6) {
-      availableDates.push(new Date(date));
-    }
-  }
-  
-  return availableDates;
-}
 
 export default Step3Schedule;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { supabase as createSupabaseClient } from '../lib/supabase/client'; 
+import { supabase as createSupabaseClient } from '../lib/supabase/client';
 
 export const useServices = () => {
   const [services, setServices] = useState([]);
@@ -17,7 +17,7 @@ export const useServices = () => {
         setUsingFallback(false);
 
         const supabase = createSupabaseClient();
-        
+
         console.log('🔍 Fetching services from Supabase...');
 
         const { data, error: supabaseError } = await supabase
@@ -36,13 +36,13 @@ export const useServices = () => {
         if (data && data.length > 0) {
           // Transformer les données pour correspondre à notre frontend
           const transformedServices = data.map(service => ({
-            id: service.id,
+            id: service.service_id, // Use service_id from database
             name: service.name,
             description: service.description || '',
             price: service.price ? `${service.price.toLocaleString('fr-FR')}.00 DA` : null,
             duration_min: service.duration_min,
             badge: service.price ? null : 'Sur devis',
-            icon: mapServiceToIcon(service.name),
+            icon: service.icon,
             rawData: service
           }));
           setServices(transformedServices);

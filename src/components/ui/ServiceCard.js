@@ -13,6 +13,22 @@ const ServiceIcon = ({ iconName, className }) => {
     microscope: Microscope,
     phone: Phone
   };
+
+  // Check if iconName is a URL (starts with http, https, or /)
+  const isUrl = iconName && (iconName.startsWith('http') || iconName.startsWith('/'));
+
+  if (isUrl) {
+    return (
+      <img 
+        src={iconName} 
+        alt="Service Icon" 
+        className={`${className} object-contain`} 
+        onError={(e) => {
+          e.target.style.display = 'none'; // Hide if fails to load
+        }}
+      />
+    );
+  }
   
   const Icon = icons[iconName] || Heart;
   return <Icon className={className} />;
