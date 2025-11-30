@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { LayoutPanelLeft, Calendar, Users, Briefcase } from 'lucide-react';
 export default function Sidebar() {
     return (
-        <nav className='flex flex-col space-y-2 items-center justify-center'>
+        <nav className='flex flex-col space-y-2 items-center justify-center w-60'>
             <div className='py-4 flex flex-col items-center justify-center'>
                 <h2 className='text-xl font-bold p-4 text-center border-b border-b-gray-400 w-full'>
                     Tableau de board clinique

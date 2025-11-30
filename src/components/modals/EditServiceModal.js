@@ -17,7 +17,8 @@ function getArray(value) {
 }
 
 export default function EditServiceModal(props) {
-    const [examsInput, setExamsInput] = useState('')
+    const [examsCategoryInput, setExamsCategoryInput] = useState('')
+    const [examsItemsInput, setExamsItemsInput] = useState('')
     const [equipInput, setEquipInput] = useState('')
     const [advInput, setAdvInput] = useState('')
     const [procInput, setProcInput] = useState('')
@@ -28,6 +29,16 @@ export default function EditServiceModal(props) {
     const procs = getArray(props.formData.procedures)
 
     function addToField(field, value, clearFn) {
+        if (field === 'exams') {
+            const cat = examsCategoryInput?.trim()
+            const items = examsItemsInput?.trim()
+            if (!items) return
+            const arr = getArray(props.formData[field])
+            props.setFormData({ ...props.formData, [field]: [...arr, { category: cat || '', items }] })
+            setExamsCategoryInput('')
+            setExamsItemsInput('')
+            return
+        }
         if (!value || !value.trim()) return
         const arr = getArray(props.formData[field])
         props.setFormData({ ...props.formData, [field]: [...arr, value.trim()] })
@@ -76,14 +87,18 @@ export default function EditServiceModal(props) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Examens</label>
                             <div className="flex gap-2">
-                                <input value={examsInput} onChange={e => setExamsInput(e.target.value)} className="flex-1 border border-gray-300 rounded-lg px-3 py-2" placeholder="Add exam" />
-                                <button onClick={() => addToField('exams', examsInput, setExamsInput)} className="bg-primary text-white px-3 py-2 rounded-lg"><Plus size={16} /></button>
+                                <input value={examsCategoryInput} onChange={e => setExamsCategoryInput(e.target.value)} className="w-1/3 border border-gray-300 rounded-lg px-3 py-2" placeholder="Catégorie" />
+                                <input value={examsItemsInput} onChange={e => setExamsItemsInput(e.target.value)} className="flex-1 border border-gray-300 rounded-lg px-3 py-2" placeholder="Items (comma separated)" />
+                                <button onClick={() => addToField('exams', null, null)} className="bg-primary text-white px-3 py-2 rounded-lg"><Plus size={16} /></button>
                             </div>
-                            <div className="mt-2 flex flex-wrap gap-2">{exams.map((it, i) => (
-                                <span key={i} className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded">
-                                    <span className="text-sm">{it}</span>
+                            <div className="mt-2 flex flex-col gap-2">{exams.map((it, i) => (
+                                <div key={i} className="flex items-start justify-between gap-2 bg-gray-100 px-3 py-2 rounded">
+                                    <div>
+                                        <div className="text-sm font-medium">{it.category || 'Général'}</div>
+                                        <div className="text-sm text-gray-600">{it.items}</div>
+                                    </div>
                                     <button onClick={() => removeFromField('exams', i)} className="text-gray-500 hover:text-gray-700"><X size={14} /></button>
-                                </span>
+                                </div>
                             ))}</div>
                         </div>
 

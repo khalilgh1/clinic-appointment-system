@@ -25,7 +25,7 @@ export default function Services() {
         price: 0,
         duration_min: 0,
         is_active: true,
-        exams: '',
+        exams: [],
         equipments: '',
         advantages: '',
         procedures: ''
@@ -49,11 +49,29 @@ export default function Services() {
             setLoading(false)
         }
     }
-
+    console.log(services[0]?.exams.fl)
     function parseListField(value) {
         if (!value) return []
         if (Array.isArray(value)) return value
         if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean)
+        return []
+    }
+
+    function parseExamsField(value) {
+        // Return array of objects: { category, items }
+        if (!value) return []
+        if (Array.isArray(value)) {
+            return value.map(v => (typeof v === 'string' ? { category: '', items: v } : v))
+        }
+        if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value)
+                if (Array.isArray(parsed)) return parsed.map(v => (typeof v === 'string' ? { category: '', items: v } : v))
+            } catch (e) {
+                // fallback to comma-separated string items
+            }
+            return value.split(',').map(s => ({ category: '', items: s.trim() })).filter(Boolean)
+        }
         return []
     }
 
@@ -65,7 +83,7 @@ export default function Services() {
             price: Number(formData.price) || 0,
             duration_min: Number(formData.duration_min) || 0,
             is_active: !!formData.is_active,
-            exams: JSON.stringify(parseListField(formData.exams)),
+            exams: JSON.stringify(formData.exams || []),
             equipments: JSON.stringify(parseListField(formData.equipments)),
             advantages: JSON.stringify(parseListField(formData.advantages)),
             procedures: JSON.stringify(parseListField(formData.procedures))
@@ -75,7 +93,7 @@ export default function Services() {
             const { error } = await sb.from('service').insert(payload)
             if (error) throw error
             setShowAddModal(false)
-            setFormData({ name: '', description: '', price: 0, duration_min: 0, is_active: true, exams: '', equipments: '', advantages: '', procedures: '' })
+            setFormData({ name: '', description: '', price: 0, duration_min: 0, is_active: true, exams: [], equipments: '', advantages: '', procedures: '' })
             fetchServices()
         } catch (err) {
             setError(err.message || String(err))
@@ -93,7 +111,7 @@ export default function Services() {
             price: Number(formData.price) || 0,
             duration_min: Number(formData.duration_min) || 0,
             is_active: !!formData.is_active,
-            exams: JSON.stringify(parseListField(formData.exams)),
+            exams: JSON.stringify(formData.exams || []),
             equipments: JSON.stringify(parseListField(formData.equipments)),
             advantages: JSON.stringify(parseListField(formData.advantages)),
             procedures: JSON.stringify(parseListField(formData.procedures))
@@ -168,7 +186,7 @@ export default function Services() {
             price: 0,
             duration_min: 0,
             is_active: true,
-            exams: '',
+            exams: [],
             equipments: '',
             advantages: '',
             procedures: ''
@@ -207,19 +225,19 @@ export default function Services() {
 
 
     function ServicesTable(props) {
-        return (<table className="w-full table-auto">
+        return (<table className="w-full table-fixed">
             <thead>
                 <tr className="text-left text-sm text-gray-600">
-                    <th className="p-3">Nom</th>
-                    <th className="p-3">Prix</th>
-                    <th className="p-3">Durée</th>
-                    <th className="p-3">Statut</th>
-                    <th className="p-3">Actions</th>
+                    <th className="p-3 w-3/5">Nom</th>
+                    <th className="p-3 w-1/12">Prix</th>
+                    <th className="p-3 w-1/12">Durée</th>
+                    <th className="p-3 w-1/12">Statut</th>
+                    <th className="p-3 w-1/12">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {props.services.map(s => <tr key={s.service_id} className="border-t">
-                    <td className="p-3 align-top">
+                    <td className="p-3 align-top max-w-full wrap-break-word">
                         <div className="font-medium">{s.name}</div>
                         <div className="text-sm text-gray-500">{s.description}</div>
 
@@ -241,7 +259,14 @@ export default function Services() {
 
                             <div className="flex items-start gap-3">
                                 <div className="text-xs font-medium text-gray-600 w-24">Examens:</div>
-                                <div className="flex-1"><BadgeList items={parseListField(s.exams)} variant="purple" /></div>
+                                <div className="flex-1">
+                                    {parseExamsField(s.exams).map((ex, i) => (
+                                        <div key={i} className="mb-2">
+                                            <div className="text-sm font-medium text-gray-700">{ex.category || 'Général'}</div>
+                                            <div className="text-sm text-gray-500 wrap-break-word whitespace-normal">{ex.items}</div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </td>
