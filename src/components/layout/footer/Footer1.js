@@ -33,32 +33,32 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#1a4d4d] text-white mt-20">
-      <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-40 2xl:px-20 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+      <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-40 2xl:px-20 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* About Section */}
           <div className="space-y-0">
-            <Link href="/" className="inline-block mb-4">
+            <Link href="/" className="inline-block mb-3">
               <Image
                 src="/jsp.png"
-                width={140}
-                height={20}
+                width={100}
+                height={16}
                 alt="Clinique PMA Fertival"
-                className="h-auto w-auto object-contain -mt-18"
+                className="h-auto w-auto object-contain"
               />
             </Link>
-            <p className="text-sm text-white/80 leading-relaxed -mt-50">
+            <p className="text-xs text-white/80 leading-relaxed">
               Nous offrons des informations de santé fiables, des conseils d'experts et des outils numériques pour vous accompagner tout au long de votre parcours.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Liens rapides</h3>
-            <ul className="space-y-2.5">
+            <h3 className="text-base font-semibold mb-3 text-white">Liens rapides</h3>
+            <ul className="space-y-2">
               <li>
                 <Link 
                   href="/"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
                 >
                   Accueil
                 </Link>
@@ -66,7 +66,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/medecins"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
                 >
                   À propos de nous
                 </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/services"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
                 >
                   Services
                 </Link>
@@ -82,7 +82,7 @@ export default function Footer() {
               <li>
                 <Link 
                   href="/about"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
                 >
                   Contact
                 </Link>
@@ -92,16 +92,16 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Services</h3>
+            <h3 className="text-base font-semibold mb-3 text-white">Services</h3>
             {loading ? (
-              <p className="text-sm text-white/70">Chargement...</p>
+              <p className="text-xs text-white/70">Chargement...</p>
             ) : (
-              <ul className="space-y-2.5">
+              <ul className="space-y-2">
                 {services.map((service, index) => (
                   <li key={index}>
                     <Link 
                       href={service.href}
-                      className="text-sm text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
+                      className="text-xs text-white/70 hover:text-white transition-colors duration-300 inline-block hover:translate-x-1 transform"
                     >
                       {service.name}
                     </Link>
@@ -113,29 +113,29 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Contact</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
+            <h3 className="text-base font-semibold mb-3 text-white">Contact</h3>
+            <ul className="space-y-2.5">
+              <li className="flex items-start gap-2.5">
                 <Phone className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
                 <a 
                   href="tel:+213XXXXXXXXX"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300"
                 >
                   +213 XXX XXX XXX
                 </a>
               </li>
-              <li className="flex items-start gap-3">
+              <li className="flex items-start gap-2.5">
                 <Mail className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
                 <a 
                   href="mailto:contact@fertival.dz"
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-300"
+                  className="text-xs text-white/70 hover:text-white transition-colors duration-300"
                 >
                   contact@fertival.dz
                 </a>
               </li>
-              <li className="flex items-start gap-3">
+              <li className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-white/70 mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-white/70">
+                <span className="text-xs text-white/80 font-medium">
                   Du Samedi à Jeudi: 7h - 21h
                 </span>
               </li>
@@ -144,8 +144,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <p className="text-center text-sm text-white/60">
+        <div className="mt-6 pt-4 border-t border-white/10">
+          <p className="text-center text-xs text-white/60">
             Copyright © FERTIVAL 2025
           </p>
         </div>

@@ -15,7 +15,7 @@ export default function FooterLogo() {
           />
         </div>
       </Link>
-      <p className="text-lg text-gray-300 leading-relaxed max-w-xs">
+      <p className="text-sm text-gray-300 leading-relaxed max-w-xs">
         Nous offrons des informations de santé fiables, des conseils d'experts et des outils numériques pour vous accompagner tout au long de votre parcours.
       </p>
     </div>

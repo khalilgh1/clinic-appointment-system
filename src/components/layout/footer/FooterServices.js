@@ -39,7 +39,7 @@ export default function FooterServices() {
       </h3>
       <ul className="space-y-3">
         {loading ? (
-          <li className="text-lg text-gray-400">
+          <li className="text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
               <span>Chargement...</span>
@@ -50,7 +50,7 @@ export default function FooterServices() {
             <li key={service.service_id}>
               <Link
                 href={`/services/${service.service_id}`}
-                className="text-lg text-gray-300 hover:text-white transition-all duration-300 inline-block relative group"
+                className="text-sm text-gray-300 hover:text-white transition-all duration-300 inline-block relative group"
               >
                 <span className="line-clamp-1">{service.name}</span>
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
@@ -58,7 +58,7 @@ export default function FooterServices() {
             </li>
           ))
         ) : (
-          <li className="text-lg text-gray-400">Aucun service disponible</li>
+          <li className="text-sm text-gray-400">Aucun service disponible</li>
         )}
       </ul>
     </div>

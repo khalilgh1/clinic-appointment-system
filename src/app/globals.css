@@ -29,7 +29,8 @@ body {
 }
 
 :root {
-  font-size: 62.5%;
+  /* Use 100% so 1rem == browser default (usually 16px).
+     This avoids unexpectedly small rem-scaled text across the site. */
   font-family: 'Roboto', sans-serif;
-   --font-pacifico: 'Pacifico', cursive;
+  --font-pacifico: 'Pacifico', cursive;
 }
