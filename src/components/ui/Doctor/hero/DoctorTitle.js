@@ -8,7 +8,7 @@ const DoctorTitle = () => {
         ÉQUIPE MÉDICALE
       </h1>
       <h2 
-        className="text-4xl md:text-5xl lg:text-6xl text-yellow-500"
+        className="text-4xl md:text-5xl lg:text-6xl text-secondary"
         style={{ fontFamily: "'Pacifico', cursive" }}
       >
         Fertival

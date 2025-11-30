@@ -6,7 +6,7 @@ export default function NavLink({ href, children, isActive }) {
       href={href}
       className="relative inline-block group"
     >
-      <span className={`text-lg font-medium transition-colors duration-300 ${
+      <span className={`font-medium transition-colors duration-300 ${
         isActive
           ? 'text-[var(--color-primary)]'
           : 'text-[var(--color-secondary-light)] group-hover:text-[var(--color-primary)]'

@@ -18,7 +18,7 @@ export default function FooterQuickLinks() {
           <li key={index}>
             <Link
               href={link.href}
-              className="text-lg text-gray-300 hover:text-white transition-all duration-300 inline-block relative group"
+              className="text-sm text-gray-300 hover:text-white transition-all duration-300 inline-block relative group"
             >
               {link.name}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>

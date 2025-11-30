@@ -82,7 +82,7 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
           onClick={() => setIsOpen(!isOpen)}
           className="relative w-full flex items-center justify-between px-6 py-4 transition-all duration-300 hover:bg-gray-50 group overflow-hidden"
         >
-          <span className={`relative z-10 text-lg font-medium transition-colors duration-300 ${
+          <span className={`relative z-10  font-medium transition-colors duration-300 ${
             isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
           }`}>
             Services
@@ -105,20 +105,20 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
         >
           <div className="bg-gray-50 py-2">
             {loading ? (
-              <div className="px-10 py-3 text-lg text-gray-500">Chargement...</div>
+              <div className="px-10 py-3  text-gray-500">Chargement...</div>
             ) : services.length > 0 ? (
               services.map((service, index) => (
                 <Link
                   key={index}
                   href={service.href}
-                  className="flex items-center justify-between px-10 py-3 text-lg font-medium text-gray-600 hover:text-[var(--color-primary)] hover:bg-white transition-all duration-200 group"
+                  className="flex items-center justify-between px-10 py-3  font-medium text-gray-600 hover:text-[var(--color-primary)] hover:bg-white transition-all duration-200 group"
                 >
                   <span className="flex-1">{service.name}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
                 </Link>
               ))
             ) : (
-              <div className="px-10 py-3 text-lg text-gray-500">Aucun service disponible</div>
+              <div className="px-10 py-3  text-gray-500">Aucun service disponible</div>
             )}
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
       onMouseLeave={handleMouseLeave}
     >
       <button className="relative">
-        <span className={`text-base lg:text-lg xl:text-xl font-medium transition-colors duration-300 ${
+        <span className={` font-medium transition-colors duration-300 ${
           isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-secondary-light)] group-hover:text-[var(--color-primary)]'
         }`}>
           Services
@@ -156,20 +156,20 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
       >
         <div className="p-2">
           {loading ? (
-            <div className="px-4 py-3.5 text-lg text-gray-500">Chargement...</div>
+            <div className="px-4 py-3.5  text-gray-500">Chargement...</div>
           ) : services.length > 0 ? (
             services.map((service, index) => (
               <Link
                 key={index}
                 href={service.href}
-                className="flex items-center justify-between px-4 py-3.5 text-lg font-medium text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-50 rounded-lg transition-all duration-200 group"
+                className="flex items-center justify-between px-4 py-3.5  font-medium text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-50 rounded-lg transition-all duration-200 group"
               >
                 <span className="flex-1 leading-relaxed">{service.name}</span>
                 <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 flex-shrink-0 ml-2" />
               </Link>
             ))
           ) : (
-            <div className="px-4 py-3.5 text-lg text-gray-500">Aucun service disponible</div>
+            <div className="px-4 py-3.5  text-gray-500">Aucun service disponible</div>
           )}
         </div>
       </div>

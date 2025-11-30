@@ -15,24 +15,24 @@ export default function Navbar({ currentPath = '/' }) {
 
   return (
     <ScrollNavbar>
-      <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-40 2xl:px-20 py-5">
-        <div className="flex items-center justify-between h-24 lg:h-28">
+      <div className="w-full px-6 sm:px-20 lg:px-12 xl:px-30 2xl:px-20 py-2">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Left Section: Logo + Navigation */}
           <div className="flex items-center">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-4 flex-shrink-0">
+            <Link href="/" className="flex items-center gap-3 flex-shrink-0">
               <Image
                 src="/logo1.png"
-                width={180}
-                height={80}
+                width={140}
+                height={60}
                 priority
                 alt="Clinique PMA Fertival"
-                className="h-80 lg:h-75 w-auto object-contain"
+                className="h-55 lg:h-60 w-auto object-contain"
               />
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-10 xl:gap-12 2xl:gap-16 ml-12 xl:ml-16 2xl:ml-20">
+            <div className="hidden lg:flex items-center gap-6 xl:gap-8 2xl:gap-10 ml-8 xl:ml-12 2xl:ml-16">
               <NavLink href="/" isActive={isHomePage}>
                 Accueil
               </NavLink>
@@ -51,13 +51,13 @@ export default function Navbar({ currentPath = '/' }) {
             {/* Desktop CTA Button */}
             <Link
               href="/MedicalBooking"
-              className="hidden lg:flex px-8 xl:px-10 py-4 rounded-full font-semibold items-center justify-center gap-4 bg-primary text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
+              className="hidden lg:flex px-6 xl:px-8 py-2.5 rounded-full font-semibold items-center justify-center gap-3 bg-primary text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
             >
-                <span className="text-lg xl:text-xl whitespace-nowrap flex items-center">
+                <span className="text-sm xl whitespace-nowrap flex items-center">
                 Prendre Rendez-Vous
               </span>
-              <div className="w-8 h-8 rounded-full bg-white backdrop-blur-sm flex items-center justify-center transition-transform group-hover:translate-x-1">
-                <ArrowRight className="w-4 h-4 text-primary" strokeWidth={3.5} />
+              <div className="w-6 h-6 rounded-full bg-white backdrop-blur-sm flex items-center justify-center transition-transform group-hover:translate-x-1">
+                <ArrowRight className="w-3.5 h-3.5 text-primary" strokeWidth={3.5} />
               </div>
             </Link>
 
@@ -66,16 +66,16 @@ export default function Navbar({ currentPath = '/' }) {
               <div className="py-2 bg-[var(--color-bg-primary)]">
                 <Link
                   href="/"
-                  className="relative block px-6 py-4 transition-all duration-300 text-lg text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
+                  className="relative block px-6 py-4 transition-all duration-300 text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
                 >
-                  <span className="relative z-10 inline-block font-medium">Accueil</span>
+                  <span className="relative z-10 inline-block font-small">Accueil</span>
                   <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${
                     isHomePage ? 'w-full' : 'group-hover:w-full'
                   }`}></span>
                 </Link>
                 <Link
                   href="/Doctor"
-                  className="relative block px-6 py-4 transition-all duration-300 text-lg text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
+                  className="relative block px-6 py-4 transition-all duration-300 text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
                 >
                   <span className="relative z-10 inline-block font-medium">Médecins</span>
                   <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${
@@ -85,7 +85,7 @@ export default function Navbar({ currentPath = '/' }) {
                 <ServicesDropdown isMobile={true} isActive={isServicesPage} />
                 <Link
                   href="/about"
-                  className="relative block px-6 py-4 transition-all duration-300 text-lg text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
+                  className="relative block px-6 py-4 transition-all duration-300 text-[var(--color-text-secondary)] hover:bg-gray-50 group overflow-hidden"
                 >
                   <span className="relative z-10 inline-block font-medium">À propos</span>
                   <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${
