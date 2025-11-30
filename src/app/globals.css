@@ -22,7 +22,7 @@ body {
   --color-secondary-light: #707677;
   --color-bg-primary: #F5F7F8;
   --color-text-secondary: #064045;
-  
+  --color-error: #FB2C36;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
