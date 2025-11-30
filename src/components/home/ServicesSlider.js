@@ -83,7 +83,7 @@ export default function ServicesSlider() {
           style={{
             display: "flex",
             gap: "16px",
-            overflowX: "hidden",
+            overflow: "hidden",
             scrollBehavior: "smooth",
             flexWrap: "nowrap",
             width: "1243px",
@@ -95,6 +95,7 @@ export default function ServicesSlider() {
                 icon={service.icon}
                 title={service.name}
                 description={service.description}
+                id ={service.service_id}
               />
             </div>
           ))}

@@ -42,7 +42,7 @@ export default function HomeHero() {
           </p>
 
           {/* Appointment button */}
-          <Link href="/appointment" passHref>
+          <Link href="/MedicalBooking" passHref>
             <button
               style={{
                 marginTop: '2rem',

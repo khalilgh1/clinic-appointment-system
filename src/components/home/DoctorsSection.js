@@ -5,7 +5,7 @@ import TitleBlock from "./TitleBlock";
 import DoctorCard from "./DoctorCard";
 import { HiOutlineArrowRight } from "react-icons/hi2";
 import {supabase} from "@/lib/supabase/client"; // your supabase client
-
+import Link from "next/link";
 export default function DoctorsSection() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +68,7 @@ export default function DoctorsSection() {
           gap: "1rem",
         }}
       >
+        <Link href="/Doctor" passHref>
         <button
           style={{
             backgroundColor: "var(--color-primary)",
@@ -98,6 +99,7 @@ export default function DoctorsSection() {
             <HiOutlineArrowRight color="var(--color-primary)" size={20} />
           </span>
         </button>
+        </Link>
       </div>
     </section>
   );

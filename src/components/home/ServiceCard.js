@@ -1,4 +1,5 @@
-export default function ServiceCard({ icon, title, description }) {
+import Link from "next/link";
+export default function ServiceCard({ icon, title, description, id }) {
   return (
     <div
       style={{
@@ -57,6 +58,7 @@ export default function ServiceCard({ icon, title, description }) {
       </div>
 
       {/* Button */}
+      <Link href={`/services/${id}`} passHref>
       <button
         style={{
           fontSize: '14px',
@@ -71,6 +73,7 @@ export default function ServiceCard({ icon, title, description }) {
       >
         En savoir plus →
       </button>
+      </Link>
     </div>
   );
 }
