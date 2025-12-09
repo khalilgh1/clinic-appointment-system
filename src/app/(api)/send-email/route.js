@@ -2,43 +2,43 @@ import nodemailer from "nodemailer";
 
 export async function POST(req) {
   try {
-    const { email, firstName, doctorName, date, time } = await req.json();
+    const body = await req.json();
 
-    // Create transporter with Ethereal
-    let transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
+    // Create a transporter using Gmail SMTP
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-        user: process.env.ETHEREAL_USER,
-        pass: process.env.ETHEREAL_PASS,
+        user: process.env.GMAIL_USER,       // your Gmail email
+        pass: process.env.GMAIL_PASSWORD,   // App Password
       },
     });
 
-    // Send email
-    let info = await transporter.sendMail({
-      from: `"Clinique" <${process.env.ETHEREAL_USER}>`,
-      to: email,
+    // Email content
+    const mailOptions = {
+      from: `"Clinique" <${process.env.GMAIL_USER}>`,
+      to: body.email,
       subject: "Confirmation de rendez-vous",
       html: `
         <h1>Rendez-vous confirmé</h1>
-        <p>Bonjour ${firstName},</p>
+        <p>Bonjour ${body.firstName},</p>
         <p>Votre rendez-vous a été confirmé.</p>
-        <p><strong>Médecin :</strong> ${doctorName}</p>
-        <p><strong>Date :</strong> ${date}</p>
-        <p><strong>Heure :</strong> ${time}</p>
+        <p><strong>Médecin :</strong> ${body.doctorName}</p>
+        <p><strong>Date :</strong> ${body.date}</p>
+        <p><strong>Heure :</strong> ${body.time}</p>
       `,
+    };
+
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    return new Response(JSON.stringify({ success: true, info }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
-
-    console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
-
-    return new Response(
-      JSON.stringify({ success: true, previewUrl: nodemailer.getTestMessageUrl(info) }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
   } catch (err) {
-    return new Response(
-      JSON.stringify({ success: false, error: err.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: false, error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
