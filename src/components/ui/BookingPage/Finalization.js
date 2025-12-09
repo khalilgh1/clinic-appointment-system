@@ -54,10 +54,12 @@ const Finalization = ({ onReturnHome }) => {
 
         // Step 6: Check slot availability again before insertion
         // Check for overlapping appointments: start_time < new_end_time AND end_time > new_start_time
+        // Only check pending or confirmed appointments (exclude cancelled)
         const { data: conflictingAppointments, error: checkError } = await supabase
           .from('appointment')
-          .select('appointment_id')
+          .select('appointment_id, status')
           .eq('doctor_id', state.selectedDoctor.id)
+          .in('status', ['pending', 'confirmed'])
           .lt('start_time', endTime.toISOString())
           .gt('end_time', startTime.toISOString());
 
@@ -66,6 +68,7 @@ const Finalization = ({ onReturnHome }) => {
         }
 
         if (conflictingAppointments && conflictingAppointments.length > 0) {
+          console.log('Conflicting appointments found:', conflictingAppointments);
           throw new Error('Ce créneau n\'est plus disponible. Veuillez choisir un autre horaire.');
         }
 
@@ -90,36 +93,41 @@ const Finalization = ({ onReturnHome }) => {
           throw new Error(`Erreur lors de la création du rendez-vous: ${insertError.message}`);
         }
 
-          setStatus('success');
+        // Appointment created successfully
+        setStatus('success');
 
-        // Send confirmation email
+        // Send confirmation email (non-blocking - don't fail the booking if email fails)
+        // Send confirmation email via Ethereal
+console.log("Envoi de l'email de confirmation à", state.patientInfo.email);
 
-        console.log('Envoi de l\'email de confirmation à', state.patientInfo.email);
-         const response = await fetch("/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: state.patientInfo.email,
-        firstName: state.patientInfo.prenom,
-        doctorName: state.selectedDoctor.name,
-        date: selectedDate,
-        time: state.selectedDateTime.time
-      })
-    });
+try {
+  const response = await fetch("/send-email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: state.patientInfo.email,
+      firstName: state.patientInfo.prenom,
+      doctorName: state.selectedDoctor.name,
+      date: selectedDate,
+      time: state.selectedDateTime.time,
+    }),
+  });
 
-    let data;
-    try {
-      data = await response.json();
-    } catch {
-      data = { success: false, message: await response.text() };
-    }
+  const data = await response.json();
+  console.log("Send Email Response:", data);
 
-    console.log("Send Email Response:", data);
+  if (!response.ok) {
+    throw new Error(data.error || "Impossible d'envoyer l'email");
+  }
 
-    if (!response.ok) {
-      throw new Error(data.error || data.message || "Impossible d'envoyer l'email");
-    }
-  
+  // Optional: show the preview URL in success state
+  console.log("Preview URL (Ethereal):", data.previewUrl);
+} catch (err) {
+  console.error("Email sending failed:", err);
+  setStatus("error");
+  setErrorMessage(`Impossible d'envoyer l'email: ${err.message}`);
+  return;
+}
 
         // Reset booking state after successful submission
         setTimeout(() => {
