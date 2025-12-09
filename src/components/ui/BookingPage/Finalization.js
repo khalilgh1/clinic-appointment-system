@@ -96,8 +96,6 @@ const Finalization = ({ onReturnHome }) => {
         // Appointment created successfully
         setStatus('success');
 
-        // Send confirmation email (non-blocking - don't fail the booking if email fails)
-        // Send confirmation email via Ethereal
 console.log("Envoi de l'email de confirmation à", state.patientInfo.email);
 
 try {
