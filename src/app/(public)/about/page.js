@@ -11,11 +11,6 @@ const AboutUsPage = () => {
         <div className="relative px-16 py-20">
           {/* Hero Content */}
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/[0.02] border border-white/[0.08] rounded-full px-3 py-2 mb-6">
-              <div className="w-4 h-4 bg-white rounded" />
-              <span className="text-white text-sm">About Us</span>
-            </div>
-            
             <h1 className="text-white text-6xl font-medium leading-tight mb-5">
               Bienvenue a <span style={{fontFamily: 'var(--font-pacifico)', color: '#FFE273'}}>Fertival</span>
             </h1>
@@ -250,13 +245,17 @@ const AboutUsPage = () => {
             
             {/* Map */}
             <div className="bg-gray-200 rounded-3xl overflow-hidden shadow-sm h-full min-h-[590px]">
-  <img 
-    src="https://api.mapbox.com/styles/v1/mapbox/light-v11/static/6.3,36.9,13,0/552x590@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw" 
-    alt="Map of Hydra" 
-    className="w-full h-full object-cover"
-  />
-</div>
-
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3196.8944857683706!2d3.0449999999999995!3d36.7642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128fb26977171e51%3A0x37182f89ce0d3d84!2sEl%20Biar%2C%20Alger!5e0!3m2!1sen!2sdz!4v1234567890123!5m2!1sen!2sdz"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </div>
       </section>
