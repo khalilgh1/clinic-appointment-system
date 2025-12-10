@@ -59,7 +59,7 @@ const Sidebar = ({ currentStep, contactPhone }) => {
   const steps = ['Service', 'Médecin', 'Date & Heure', 'Informations'];
   
   return (
-    <div className="bg-primary text-white h-full flex flex-col overflow-y-auto md:min-h-screen md:w-64 w-full">
+    <div className="bg-primary text-white h-full flex flex-col overflow-y-auto md:min-h-screen md:w-64 w-full no-scrollbar">
       <div className="p-6 flex-1">
         
         {/* step indicator */}

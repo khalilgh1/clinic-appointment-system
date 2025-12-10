@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { CheckCircle, XCircle, Home } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
 import { supabase as createSupabaseClient } from '@/lib/supabase/client';
 
-const Finalization = ({ onReturnHome }) => {
+const Finalization = () => { 
   const { state, dispatch } = useBooking();
-  const [status, setStatus] = useState('loading'); // 'loading', 'success', 'error'
+  const router = useRouter();
+  const [status, setStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -53,7 +55,6 @@ const Finalization = ({ onReturnHome }) => {
         endTime.setMinutes(endTime.getMinutes() + durationMin);
 
         // Step 6: Check slot availability again before insertion
-        // Check for overlapping appointments: start_time < new_end_time AND end_time > new_start_time
         const { data: conflictingAppointments, error: checkError } = await supabase
           .from('appointment')
           .select('appointment_id')
@@ -101,13 +102,21 @@ const Finalization = ({ onReturnHome }) => {
         setStatus('error');
         setErrorMessage(error.message || 'Une erreur inattendue est survenue. Veuillez contacter le support.');
         console.error('Erreur lors de la réservation:', error);
-        setHasSubmitted(false); // Allow retry
+        setHasSubmitted(false);
       }
     };
 
     submitAppointment();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasSubmitted]);
+
+  // Handle return to home - 
+  const handleReturnHome = () => {
+    // Reset the booking context state
+    dispatch({ type: 'RESET_BOOKING' });
+    
+    // Redirect to home page
+    router.push('/');
+  };
 
   // Animation de succès
   const SuccessAnimation = () => (
@@ -122,7 +131,6 @@ const Finalization = ({ onReturnHome }) => {
         Votre rendez-vous a été enregistré avec succès. Vous recevrez un email de confirmation dans quelques minutes.
       </p>
       
-      {/* Instructions après confirmation */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-md w-full">
         <h4 className="font-semibold text-green-800 mb-3">Prochaines étapes</h4>
         <ul className="space-y-2 text-sm text-green-700">
@@ -135,7 +143,6 @@ const Finalization = ({ onReturnHome }) => {
     </div>
   );
 
-  // Animation d'erreur
   const ErrorAnimation = () => (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-6">
@@ -146,7 +153,6 @@ const Finalization = ({ onReturnHome }) => {
         {errorMessage}
       </p>
       
-      {/* Instructions en cas d'erreur */}
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full">
         <h4 className="font-semibold text-red-800 mb-3">Que faire maintenant ?</h4>
         <ul className="space-y-2 text-sm text-red-700">
@@ -158,7 +164,6 @@ const Finalization = ({ onReturnHome }) => {
     </div>
   );
 
-  // Animation de chargement
   const LoadingAnimation = () => (
     <div className="flex flex-col items-center justify-center py-16">
       <div className="relative mb-6">
@@ -178,12 +183,10 @@ const Finalization = ({ onReturnHome }) => {
          status === 'success' ? 'Confirmation terminée' : 'Erreur de réservation'}
       </h1>
 
-      {/* Animation selon le statut */}
       {status === 'loading' && <LoadingAnimation />}
       {status === 'success' && <SuccessAnimation />}
       {status === 'error' && <ErrorAnimation />}
 
-      {/* Boutons d'action */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 pt-8 border-t border-gray-200">
         {status === 'error' && (
           <button
@@ -195,15 +198,13 @@ const Finalization = ({ onReturnHome }) => {
         )}
         
         <button
-          onClick={onReturnHome}
+          onClick={handleReturnHome}
           className="bg-primary text-white font-semibold px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
         >
           <Home className="w-5 h-5" />
           Revenir à la page d'accueil
         </button>
       </div>
-
-      
     </div>
   );
 };

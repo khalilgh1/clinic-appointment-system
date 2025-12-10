@@ -32,7 +32,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-[#1a4d4d] text-white mt-20">
+    <footer className="bg-[#1a4d4d] text-white ">
       <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-40 2xl:px-20 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* About Section */}
