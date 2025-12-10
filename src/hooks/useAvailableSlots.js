@@ -167,4 +167,3 @@ export const useAvailableSlots = (doctorId, serviceId, selectedDate) => {
 
   return { availableSlots, loading, error };
 };
-
