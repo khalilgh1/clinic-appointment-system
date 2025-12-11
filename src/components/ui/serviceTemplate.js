@@ -301,7 +301,7 @@ export default function ServiceTemplate({ service }) {
                 <p className="text-2xl font-bold tracking-wide">07:00 - 21:00</p>
               </div>
 
-              <Link href="/MedicalBooking" className="block">
+              <Link href={`/MedicalBooking?serviceId=${service.service_id}`} className="block">
                 <button className="w-full bg-[#fce57e] hover:bg-[#f5dc6b] text-[#0f3c46] font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95">
                   Prendre Rendez-Vous
                 </button>

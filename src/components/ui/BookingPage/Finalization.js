@@ -55,10 +55,13 @@ const Finalization = () => {
         endTime.setMinutes(endTime.getMinutes() + durationMin);
 
         // Step 6: Check slot availability again before insertion
+        // Check for overlapping appointments: start_time < new_end_time AND end_time > new_start_time
+        // Only check pending or confirmed appointments (exclude cancelled)
         const { data: conflictingAppointments, error: checkError } = await supabase
           .from('appointment')
-          .select('appointment_id')
+          .select('appointment_id, status')
           .eq('doctor_id', state.selectedDoctor.id)
+          .in('status', ['pending', 'confirmed'])
           .lt('start_time', endTime.toISOString())
           .gt('end_time', startTime.toISOString());
 
@@ -67,6 +70,7 @@ const Finalization = () => {
         }
 
         if (conflictingAppointments && conflictingAppointments.length > 0) {
+          console.log('Conflicting appointments found:', conflictingAppointments);
           throw new Error('Ce créneau n\'est plus disponible. Veuillez choisir un autre horaire.');
         }
 
@@ -91,8 +95,40 @@ const Finalization = () => {
           throw new Error(`Erreur lors de la création du rendez-vous: ${insertError.message}`);
         }
 
+        // Appointment created successfully
         setStatus('success');
-        
+
+console.log("Envoi de l'email de confirmation à", state.patientInfo.email);
+
+try {
+  const response = await fetch("/send-email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: state.patientInfo.email,
+      firstName: state.patientInfo.prenom,
+      doctorName: state.selectedDoctor.name,
+      date: selectedDate,
+      time: state.selectedDateTime.time,
+    }),
+  });
+
+  const data = await response.json();
+  console.log("Send Email Response:", data);
+
+  if (!response.ok) {
+    throw new Error(data.error || "Impossible d'envoyer l'email");
+  }
+
+  // Optional: show the preview URL in success state
+  console.log("Preview URL (Ethereal):", data.previewUrl);
+} catch (err) {
+  console.error("Email sending failed:", err);
+  setStatus("error");
+  setErrorMessage(`Impossible d'envoyer l'email: ${err.message}`);
+  return;
+}
+
         // Reset booking state after successful submission
         setTimeout(() => {
           dispatch({ type: 'RESET_BOOKING' });
