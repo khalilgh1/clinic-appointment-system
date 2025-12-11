@@ -1,9 +1,36 @@
+/* globals.css - Add these styles */
 @import "tailwindcss";
 
-body {
+:root {
+  font-family: 'Roboto', sans-serif;
+  --font-pacifico: 'Pacifico', cursive;
+  /* Prevent zoom issues */
+  touch-action: pan-x pan-y;
+  height: 100% !important;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Fix flex container for booking page */
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1 0 auto;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -13,6 +40,13 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE + Edge */
   scrollbar-width: none;     /* Firefox */
+  overflow: -moz-scrollbars-none;
+}
+
+/* Fix for booking page specific layout */
+.h-screen-fixed {
+  height: 100vh;
+  height: 100dvh; /* For mobile browsers */
 }
 
 @theme {
@@ -26,11 +60,4 @@ body {
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-}
-
-:root {
-  /* Use 100% so 1rem == browser default (usually 16px).
-     This avoids unexpectedly small rem-scaled text across the site. */
-  font-family: 'Roboto', sans-serif;
-  --font-pacifico: 'Pacifico', cursive;
 }

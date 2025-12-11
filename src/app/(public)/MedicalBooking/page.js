@@ -24,11 +24,12 @@ const BookingFlow = ({ initialStep }) => {
 
 
   const goNext = () => {
-  if (currentStep === 4) {
-    setShowFinalization(true);
-  } else {
-    setCurrentStep(prev => prev + 1);
-  }};
+    if (currentStep === 4) {
+      setShowFinalization(true);
+    } else {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
 
   const goBack = () => {
     if (currentStep > 1) {
@@ -57,7 +58,7 @@ const BookingFlow = ({ initialStep }) => {
         <div className="max-w-5xl mx-auto">
 
           {showFinalization ? (
-            <Finalization onReturnHome={handleReturnHome} />
+            <Finalization />
           ) : (
             <>
               {currentStep === 1 && (

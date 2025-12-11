@@ -7,7 +7,7 @@ import FooterContact from './FooterContact';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#064045] text-white mt-20">
+    <footer className="bg-[#064045] text-white ">
       <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-25 2xl:px-20 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
           {/* Logo & Description */}
