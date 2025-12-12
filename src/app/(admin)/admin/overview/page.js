@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DailyTimeline from '@/components/charts/DailyTimeline';
 import WeeklyTrend from '@/components/charts/WeeklyTrend';
@@ -8,7 +9,10 @@ function formatNumber(n) {
 
 export default async function Overview() {
     const supabase = await createClient();
-
+    const { data } = await supabase.auth.getSession()
+    if (!data.session) {
+        redirect('/admin/login')
+    }
     // fetch appointments for the last 30 days to compute stats and weekly trends
     const now = new Date();
     const sevenDaysAgo = new Date(now);
