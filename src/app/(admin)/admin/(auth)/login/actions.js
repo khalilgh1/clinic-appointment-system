@@ -67,71 +67,38 @@ export async function login(email, password) {
 
 export async function sendResetEmail(email) {
     const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
-    try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?type=recovery`,
-        });
-
-        if (error) {
-            return {
-                success: false,
-                message: error.message || 'Failed to send reset email. Please try again.',
-            };
-        }
-
-        return {
-            success: true,
-            message: 'Password reset email sent successfully. Please check your inbox.',
-        };
-    } catch (error) {
-        console.error('Reset email error:', error);
+    if (error) {
         return {
             success: false,
-            message: 'An error occurred while sending the reset email. Please try again.',
+            message: error.message || 'Failed to send reset email. Please try again.',
         };
     }
+
+    return {
+        success: true,
+        message: 'Password reset email sent successfully. Please check your inbox.',
+    };
 }
 
 export async function updatePassword(newPassword) {
     const supabase = await createClient();
-
-    try {
-        // Get the current user session
-        const { data: sessionData } = await supabase.auth.getSession();
-
-        if (!sessionData?.session?.user) {
-            return {
-                success: false,
-                message: 'Your session has expired. Please try the reset link again.',
-            };
-        }
-
-        // Update the user's password
-        const { error } = await supabase.auth.updateUser({
-            password: newPassword,
-        });
-
-        if (error) {
-            return {
-                success: false,
-                message: error.message || 'Failed to update password. Please try again.',
-            };
-        }
-
-        revalidatePath('/admin/login');
-
-        return {
-            success: true,
-            message: 'Password updated successfully! You will be redirected to login.',
-        };
-    } catch (error) {
-        console.error('Password update error:', error);
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
+    });
+    if (error) {
         return {
             success: false,
-            message: 'An error occurred while updating the password. Please try again.',
+            message: error.message || 'Failed to update password. Please try again.',
         };
     }
+    return {
+        success: true,
+        message: 'Password updated successfully.',
+        user: data.user,
+    };
+       
 }
 
 export async function logout() {
