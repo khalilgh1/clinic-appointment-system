@@ -194,124 +194,119 @@ export default function ServicesPage() {
         setShowAddModal(true)
     }
 
-    function BadgeList({ items = [], maxVisible = 5, variant = 'gray' }) {
-        const [expanded, setExpanded] = useState(false)
-        const colorClasses = {
-            gray: 'bg-gray-100 text-gray-800',
-            blue: 'bg-blue-50 text-blue-800',
-            green: 'bg-green-50 text-green-800',
-            yellow: 'bg-yellow-50 text-yellow-800',
-            purple: 'bg-purple-50 text-purple-800'
+    const renderTextList = (value, fallback) => {
+        const items = parseListField(value)
+        if (!items.length) {
+            return <p className="text-sm text-gray-400">{fallback}</p>
         }
-
-        if (!items || items.length === 0) return <div className="text-sm text-gray-400">—</div>
-
-        const visible = expanded ? items : items.slice(0, maxVisible)
-
         return (
-            <div className="flex flex-wrap items-center gap-2">
-                {visible.map((it, i) => (
-                    <span key={i} title={it} className={`text-sm ${colorClasses[variant] || colorClasses.gray} px-2 py-1 rounded-md max-w-xs truncate`}>{it}</span>
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 mt-1">
+                {items.map((item, index) => (
+                    <li key={index}>{item}</li>
                 ))}
-
-                {items.length > maxVisible && (
-                    !expanded
-                        ? <button onClick={() => setExpanded(true)} className="text-xs text-primary underline ml-1">+{items.length - maxVisible} more</button>
-                        : <button onClick={() => setExpanded(false)} className="text-xs text-gray-500 underline ml-1">show less</button>
-                )}
-            </div>
+            </ul>
         )
     }
 
-
-    function ServicesTable(props) {
-        return (<table className="w-full table-fixed">
-            <thead>
-                <tr className="text-left text-sm text-gray-600">
-                    <th className="p-3 w-3/5">Nom</th>
-                    <th className="p-3 w-1/12">Prix</th>
-                    <th className="p-3 w-1/12">Durée</th>
-                    <th className="p-3 w-1/12">Statut</th>
-                    <th className="p-3 w-1/12">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {props.services.map(s => <tr key={s.service_id} className="border-t">
-                    <td className="p-3 align-top max-w-full wrap-break-word">
-                        <div className="font-medium">{s.name}</div>
-                        <div className="text-sm text-gray-500">{s.description}</div>
-
-                        <div className="mt-3 space-y-2">
-                            <div className="flex items-start gap-3">
-                                <div className="text-xs font-medium text-gray-600 w-24">Équipements:</div>
-                                <div className="flex-1"><BadgeList items={parseListField(s.equipments)} variant="blue" /></div>
-                            </div>
-
-                            <div className="flex items-start gap-3">
-                                <div className="text-xs font-medium text-gray-600 w-24">Procédures:</div>
-                                <div className="flex-1"><BadgeList items={parseListField(s.procedures)} variant="green" /></div>
-                            </div>
-
-                            <div className="flex items-start gap-3">
-                                <div className="text-xs font-medium text-gray-600 w-24">Avantages:</div>
-                                <div className="flex-1"><BadgeList items={parseListField(s.advantages)} variant="yellow" /></div>
-                            </div>
-
-                            <div className="flex items-start gap-3">
-                                <div className="text-xs font-medium text-gray-600 w-24">Examens:</div>
-                                <div className="flex-1">
-                                    {parseExamsField(s.exams).map((ex, i) => (
-                                        <div key={i} className="mb-2">
-                                            <div className="text-sm font-medium text-gray-700">{ex.category || 'Général'}</div>
-                                            <div className="text-sm text-gray-500 wrap-break-word whitespace-normal">{ex.items}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td className="p-3 align-top">{s.price} DA</td>
-                    <td className="p-3 align-top">{s.duration_min} min</td>
-                    <td className="p-3 align-top">
-                        {s.is_active ? <span className="px-2 py-1 rounded text-white bg-secondary-dark">Active</span> : <span className="px-2 py-1 rounded text-white bg-gray-400">Inactive</span>}
-                    </td>
-                    <td className="p-3 align-top">
-                        <div className="flex gap-2">
-                            <button onClick={() => openEditModal(s)} className="flex items-center gap-2 px-3 py-1 rounded border border-gray-200 hover:bg-gray-50">
-                                <Edit size={14} /> Modifier
-                            </button>
-                            <button onClick={() => handleDeleteService(s.service_id)} className="flex items-center gap-2 px-3 py-1 rounded border border-gray-200 hover:bg-gray-50 text-error">
-                                <Trash2 size={14} /> Supprimer
-                            </button>
-                        </div>
-                    </td>
-                </tr>)}
-            </tbody>
-        </table>);
+    const renderExams = (value) => {
+        const exams = parseExamsField(value)
+        if (!exams.length) {
+            return <p className="text-sm text-gray-400">Aucun examen</p>
+        }
+        return (
+            <ul className="space-y-2 mt-1 text-sm text-gray-700">
+                {exams.map((exam, index) => {
+                    const items = Array.isArray(exam.items) ? exam.items : [exam.items]
+                    const displayItems = items.filter(Boolean).join(', ')
+                    return (
+                        <li key={index}>
+                            <span className="font-medium text-gray-800">{exam.category || 'Général'} :</span>
+                            <span className="ml-1 text-gray-600">{displayItems || '—'}</span>
+                        </li>
+                    )
+                })}
+            </ul>
+        )
     }
 
+    const statusBadge = (isActive) => (
+        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700'}`}>
+            {isActive ? 'Active' : 'Inactive'}
+        </span>
+    )
+
     return (
-        <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold">Services</h1>
-                <div className="flex items-center gap-3">
-                    <button onClick={openAddModal} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg cursor-pointer">
-                        <Plus size={16} /> Ajouter
-                    </button>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow-sm">
-                {loading && <div className="py-6 text-center">Loading...</div>}
-                {error && <div className="text-error mb-3">{error}</div>}
-
-                {!loading && services.length === 0 && <div className="py-6 text-center text-gray-600">No services yet.</div>}
-
-                {!loading && services.length > 0 && (
-                    <div className="overflow-x-auto">
-                        <ServicesTable services={services}></ServicesTable>
+        <div className="min-h-screen bg-gray-100 py-10 px-4">
+            <div className="max-w-6xl mx-auto space-y-8">
+                <header className="bg-gradient-to-br from-primary to-teal-800 text-white rounded-[28px] p-8 shadow-2xl flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p className="text-sm uppercase tracking-[0.3em] text-white/70">Nos Services</p>
+                        <h1 className="text-3xl font-bold">Des services complets et personnalisés</h1>
+                        <p className="mt-2 text-sm text-white/80 max-w-2xl">
+                            Liste détaillée de chaque prestation : équipements, procédures, avantages et examens sont présentés pour faciliter le pilotage clinique.
+                        </p>
                     </div>
-                )}
+                    <button onClick={openAddModal} className="inline-flex items-center gap-2 bg-white text-emerald-800 font-semibold px-5 py-3 rounded-full shadow-lg">
+                        <Plus size={18} /> Ajouter un service
+                    </button>
+                </header>
+
+                <div className="space-y-6">
+                    {loading && <div className="text-center text-gray-600 py-6">Chargement...</div>}
+                    {error && <div className="text-center text-error py-4">{error}</div>}
+                    {!loading && !error && services.length === 0 && <div className="text-center text-gray-600 py-6">Aucun service pour le moment.</div>}
+
+                    {!loading && services.map((service) => (
+                        <section key={service.service_id} className="bg-white rounded-[32px] shadow-2xl overflow-hidden border border-emerald-100">
+                            <div className="bg-gradient-to-r from-primary to-teal-800 text-white px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div>
+                                    <h2 className="text-2xl font-semibold">{service.name}</h2>
+                                    <p className="text-sm text-white/80 mt-1 max-w-3xl">{service.description}</p>
+                                </div>
+                                <div className="flex gap-3 items-center">
+                                    {statusBadge(service.is_active)}
+                                    <button onClick={() => openEditModal(service)} className="flex items-center gap-2 px-4 py-2 border border-white/40 rounded-full bg-white/10 text-white transition hover:bg-white/20">
+                                        <Edit size={14} /> Modifier
+                                    </button>
+                                    <button onClick={() => handleDeleteService(service.service_id)} className="flex items-center gap-2 px-4 py-2 border border-white/40 rounded-full bg-red-500 text-white hover:bg-red-600 transition">
+                                        <Trash2 size={14} /> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="px-6 py-8 bg-white">
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full text-sm text-gray-600 border-separate border-spacing-y-4">
+                                        <thead>
+                                            <tr className="text-left text-xs uppercase tracking-[0.2em] text-gray-500">
+                                                <th className="pb-3">Équipements</th>
+                                                <th className="pb-3">Procédures</th>
+                                                <th className="pb-3">Avantages</th>
+                                                <th className="pb-3">Examens</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td className="align-top pt-3 pr-6">
+                                                    {renderTextList(service.equipments, 'Pas d’équipement renseigné')}
+                                                </td>
+                                                <td className="align-top pt-3 pr-6">
+                                                    {renderTextList(service.procedures, 'Pas de procédure définie')}
+                                                </td>
+                                                <td className="align-top pt-3 pr-6">
+                                                    {renderTextList(service.advantages, 'Aucun avantage spécifié')}
+                                                </td>
+                                                <td className="align-top pt-3 pr-6">
+                                                    {renderExams(service.exams)}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    ))}
+                </div>
             </div>
 
             {showAddModal && (
