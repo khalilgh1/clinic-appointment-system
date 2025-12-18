@@ -46,7 +46,7 @@ const BookingFlow = ({ initialStep }) => {
   } ;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-bg-primary">
+    <div className="flex flex-col md:flex-row min-h-screen bg-bg-primary pt-6 md:pt-8">
       
       {/* Sidebar */}
       <div className="w-full md:w-64 flex-shrink-0">

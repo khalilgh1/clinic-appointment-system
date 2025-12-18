@@ -6,14 +6,13 @@
   --font-pacifico: 'Pacifico', cursive;
   /* Prevent zoom issues */
   touch-action: pan-x pan-y;
-  height: 100% !important;
 }
 
 html, body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;

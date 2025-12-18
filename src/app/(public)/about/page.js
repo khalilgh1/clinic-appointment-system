@@ -4,18 +4,31 @@ import { MapPin, Phone, Clock, Mail } from 'lucide-react';
 const AboutUsPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-[#064045] rounded-3xl mx-5 mt-5 overflow-hidden">
-        <div className="absolute inset-0 bg-white/[0.02]" />
+      {/* Hero Section - No top margin, navbar fits into it */}
+      <section className="relative bg-[#064045] overflow-hidden">
+        {/* Background Pattern - Wave Lines */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="wave-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+                <path d="M0 10 Q 25 5, 50 10 T 100 10" fill="none" stroke="white" strokeWidth="0.5"/>
+                <path d="M0 15 Q 25 10, 50 15 T 100 15" fill="none" stroke="white" strokeWidth="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#wave-pattern)"/>
+          </svg>
+        </div>
         
-        <div className="relative px-16 py-20">
+        {/* Add padding top to account for navbar height */}
+        <div className="relative px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 pt-32 lg:pt-40 pb-24 lg:pb-32">
           {/* Hero Content */}
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <h1 className="text-white text-6xl font-medium leading-tight mb-5">
+
+            <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl leading-tight mb-6">
               Bienvenue a <span style={{fontFamily: 'var(--font-pacifico)', color: '#FFE273'}}>Fertival</span>
             </h1>
             
-            <p className="text-white text-lg leading-relaxed opacity-90" style={{fontFamily: 'Arimo, sans-serif'}}>
+            <p className="text-white/90 text-lg sm:text-xl leading-relaxed max-w-2xl" style={{fontFamily: 'Arimo, sans-serif'}}>
               Une clinique spécialisée dans la fertilité et la procréation médicalement assistée (PMA). 
               Nous offrons un environnement rassurant, une expertise scientifique reconnue et une approche 
               profondément humaine.
