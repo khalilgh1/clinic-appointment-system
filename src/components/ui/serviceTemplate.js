@@ -296,9 +296,25 @@ export default function ServiceTemplate({ service }) {
                 <h3 className="text-lg font-bold">Horaires d'ouverture</h3>
               </div>
 
-              <div className="mb-8">
-                <p className="text-gray-300 text-sm mb-2">Du Samedi à Jeudi</p>
-                <p className="text-2xl font-bold tracking-wide">07:00 - 21:00</p>
+              <div className="mb-8 space-y-1">
+                {service.opening_days || service.openingDays || service.days ? (
+                  <p className="text-gray-200 text-sm">
+                    {service.opening_days || service.openingDays || service.days}
+                  </p>
+                ) : null}
+
+                {service.opening_hours || service.openingHours || service.hours ? (
+                  <p className="text-2xl font-bold tracking-wide">
+                    {service.opening_hours || service.openingHours || service.hours}
+                  </p>
+                ) : null}
+
+                {!service.opening_days && !service.openingDays && !service.days &&
+                 !service.opening_hours && !service.openingHours && !service.hours && (
+                  <p className="text-gray-200 text-sm">
+                    Consultez les disponibilités en temps réel lors de la réservation.
+                  </p>
+                )}
               </div>
 
               <Link href={`/MedicalBooking?serviceId=${service.service_id}`} className="block">
