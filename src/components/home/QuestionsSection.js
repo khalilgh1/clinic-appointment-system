@@ -28,7 +28,7 @@ export default function QuestionsSection() {
   ];
 
   return (
-    <section style={{ padding: "4rem 2rem" }}>
+    <section style={{ padding: "clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem)" }}>
       {/* Title Block */}
       <TitleBlock
         titleStart="Avez-vous"
@@ -37,7 +37,7 @@ export default function QuestionsSection() {
       />
 
       {/* FAQ Cards */}
-      <div style={{ marginTop: "2.5rem" }}>
+      <div style={{ marginTop: "2.5rem", width: "100%", maxWidth: "880px", marginLeft: "auto", marginRight: "auto" }}>
         {faqList.map((item, index) => (
           <FAQCard key={index} question={item.q} answer={item.a} />
         ))}

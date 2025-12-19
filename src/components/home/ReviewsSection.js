@@ -7,20 +7,22 @@ function ReviewCard({ text, author }) {
   return (
     <div
       style={{
-        width: "365.33px",
-        height: "181.8px",
+        width: "100%",
+        minWidth: "280px",
+        maxWidth: "365.33px",
+        minHeight: "181.8px",
         backgroundColor: "#F5F7F8",
         borderRadius: "24px",
-        padding: "2rem",
+        padding: "clamp(1.5rem, 4vw, 2rem)",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center", // centers both review + name vertically
+        justifyContent: "center",
         boxSizing: "border-box",
       }}
     >
       <p
         style={{
-          fontSize: "16px",
+          fontSize: "clamp(14px, 2vw, 16px)",
           color: "#010B0C",
           fontFamily: "Roboto, sans-serif",
           margin: 0,
@@ -32,12 +34,12 @@ function ReviewCard({ text, author }) {
 
       <span
         style={{
-          fontSize: "14px",
+          fontSize: "clamp(13px, 1.8vw, 14px)",
           color: "#064045",
           fontFamily: "Roboto, sans-serif",
           fontWeight: 700,
           textAlign: "left",
-          marginTop: "0.6rem", // subtle spacing
+          marginTop: "0.6rem",
         }}
       >
         {author}
@@ -65,7 +67,7 @@ export default function ReviewsSection() {
   ];
 
   return (
-    <section style={{ padding: "4rem 2rem", textAlign: "center" }}>
+    <section style={{ padding: "clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem)", textAlign: "center" }}>
       <TitleBlock
         titleStart="Ce que nos patients"
         titleEnd="disent de nous"
@@ -75,10 +77,11 @@ export default function ReviewsSection() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "center",
-          gap: "2rem",
+          gap: "clamp(1rem, 3vw, 2rem)",
           marginTop: "3rem",
-          height: "181.8px", // to match card height
+          alignItems: "stretch",
         }}
       >
         {reviews.map((review, index) => (

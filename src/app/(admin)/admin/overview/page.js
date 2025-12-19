@@ -126,7 +126,7 @@ export default async function Overview() {
                 <p className="text-sm text-gray-600">Aperçu des statistiques récentes</p>
             </header>
 
-            <section className="grid grid-cols-3 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 rounded" style={{ background: 'white', borderRadius: 'var(--radius-md)' }}>
                     <div className="text-sm text-gray-500">Patients au total</div>
                     <div className="text-2xl font-semibold">{formatNumber(totalPatients)}</div>
@@ -144,12 +144,12 @@ export default async function Overview() {
                 </div>
             </section>
 
-            <section className="grid grid-cols-2 gap-6">
-                <div>
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 rounded" style={{ background: 'white', borderRadius: 'var(--radius-md)' }}>
                     <DailyTimeline data={hourlyData} />
                 </div>
 
-                <div>
+                <div className="p-4 rounded" style={{ background: 'white', borderRadius: 'var(--radius-md)' }}>
                     <WeeklyTrend data={weeklyData} />
                 </div>
             </section>
