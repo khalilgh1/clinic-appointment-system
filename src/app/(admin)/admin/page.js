@@ -1,14 +1,20 @@
-import React from 'react';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+
 
 export const metadata = {
 	title: 'Admin',
 };
 
-export default function AdminPage() {
-	return (
-		<main className="min-h-screen p-6 bg-white">
-			<h1 className="text-2xl font-semibold text-gray-900">Admin dashboard</h1>
-			<p className="mt-3 text-sm text-gray-600">Select a section from the sidebar to manage the clinic.</p>
-		</main>
-	);
+
+export default async function AdminPage() {
+	const supabase = await createClient()
+	const { data } = await supabase.auth.getSession()
+
+	if (!data.session) {
+		redirect('/admin/login')
+	}
+
+	redirect('/admin/overview')
 }
+

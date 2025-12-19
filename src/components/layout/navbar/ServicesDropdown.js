@@ -6,12 +6,25 @@ import Link from 'next/link';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { supabase as createSupabaseClient } from '@/lib/supabase/client';
 
-export default function ServicesDropdown({ isMobile = false, isActive = false }) {
+export default function ServicesDropdown({ isMobile = false, isActive = false, theme = 'theme1' }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [services, setServices] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [isScrolled, setIsScrolled] = React.useState(false);
   const pathname = usePathname();
   const timeoutRef = React.useRef(null);
+  const isTheme1 = theme === 'theme1';
+
+  React.useEffect(() => {
+    const checkScroll = () => {
+      const nav = document.querySelector('nav[data-scrolled]');
+      setIsScrolled(nav?.getAttribute('data-scrolled') === 'true');
+    };
+
+    checkScroll();
+    const interval = setInterval(checkScroll, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch services from Supabase
   React.useEffect(() => {
@@ -77,50 +90,32 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
 
   if (isMobile) {
     return (
-      <div className="border-t border-gray-100">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative w-full flex items-center justify-between px-6 py-4 transition-all duration-300 hover:bg-gray-50 group overflow-hidden"
-        >
-          <span className={`relative z-10  font-medium transition-colors duration-300 ${
-            isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
+      <div className="border-t border-gray-100 py-4">
+        <div className="px-6 mb-3">
+          <span className={`font-medium text-lg ${
+            isTheme1 ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)]'
           }`}>
             Services
           </span>
-          <ChevronDown 
-            size={18} 
-            className={`relative z-10 text-gray-500 transition-all duration-300 ${
-              isOpen ? 'rotate-180' : ''
-            } ${isActive ? 'text-[var(--color-primary)]' : 'group-hover:text-[var(--color-primary)]'}`}
-          />
-          <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${
-            isActive ? 'w-full' : 'group-hover:w-full'
-          }`}></span>
-        </button>
+        </div>
         
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <div className="bg-gray-50 py-2">
-            {loading ? (
-              <div className="px-10 py-3  text-gray-500">Chargement...</div>
-            ) : services.length > 0 ? (
-              services.map((service, index) => (
-                <Link
-                  key={index}
-                  href={service.href}
-                  className="flex items-center justify-between px-10 py-3  font-medium text-gray-600 hover:text-[var(--color-primary)] hover:bg-white transition-all duration-200 group"
-                >
-                  <span className="flex-1">{service.name}</span>
-                  <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
-                </Link>
-              ))
-            ) : (
-              <div className="px-10 py-3  text-gray-500">Aucun service disponible</div>
-            )}
-          </div>
+        <div className="space-y-1">
+          {loading ? (
+            <div className="px-6 py-2 text-gray-500">Chargement...</div>
+          ) : services.length > 0 ? (
+            services.map((service, index) => (
+              <Link
+                key={index}
+                href={service.href}
+                className="flex items-center justify-between px-6 py-3 text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-50 transition-all duration-200 group"
+              >
+                <span className="flex-1 text-base">{service.name}</span>
+                <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[var(--color-primary)] transition-colors" />
+              </Link>
+            ))
+          ) : (
+            <div className="px-6 py-2 text-gray-500">Aucun service disponible</div>
+          )}
         </div>
       </div>
     );
@@ -133,24 +128,34 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
       onMouseLeave={handleMouseLeave}
     >
       <button className="relative">
-        <span className={` font-medium transition-colors duration-300 ${
-          isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-secondary-light)] group-hover:text-[var(--color-primary)]'
+        <span className={`text-sm font-medium transition-colors duration-300 ${
+          isActive
+            ? isTheme1 ? 'text-[var(--color-primary)]' : 'text-white'
+            : isTheme1
+              ? 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
+              : 'text-white/80 group-hover:text-white'
         }`}>
           Services
         </span>
         <ChevronDown 
-          size={16} 
+          size={14} 
           className={`inline-block ml-1 transition-all duration-300 ${
             isOpen ? 'rotate-180' : ''
-          } ${isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-secondary-light)] group-hover:text-[var(--color-primary)]'}`}
+          } ${
+            isActive
+              ? isTheme1 ? 'text-[var(--color-primary)]' : 'text-white'
+              : isTheme1
+                ? 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
+                : 'text-white/80 group-hover:text-white'
+          }`}
         />
-        <span className={`absolute -bottom-1 left-0 h-0.5 bg-[var(--color-primary)] transition-all duration-300 ${
-          isActive || isOpen ? 'w-full' : 'w-0 group-hover:w-full'
-        }`}></span>
+        <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
+          isTheme1 ? 'bg-[var(--color-primary)]' : 'bg-white'
+        } ${isActive || isOpen ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
       </button>
 
       <div
-        className={`absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border border-gray-100 ${
+        className={`absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border border-gray-100 ${
           isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4 pointer-events-none'
         }`}
       >
@@ -162,7 +167,7 @@ export default function ServicesDropdown({ isMobile = false, isActive = false })
               <Link
                 key={index}
                 href={service.href}
-                className="flex items-center justify-between px-4 py-3.5  font-medium text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-50 rounded-lg transition-all duration-200 group"
+                className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-50 rounded-lg transition-all duration-200 group"
               >
                 <span className="flex-1 leading-relaxed">{service.name}</span>
                 <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 flex-shrink-0 ml-2" />

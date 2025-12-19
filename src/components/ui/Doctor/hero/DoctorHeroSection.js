@@ -6,7 +6,7 @@ import DoctorDescription from './DoctorDescription';
 
 const DoctorHeroSection = () => {
   return (
-    <section className="w-full py-12 md:py-16 lg:py-20">
+    <section className="w-full py-12 md:py-16 lg:py-12">
       <div className="w-full px-4 md:px-8 lg:px-12">
         <DoctorTitle />
         <DoctorSlider />

@@ -39,14 +39,19 @@ const bookingReducer = (state, action) => {
   }
 };
 
-const initialState = {
+const defaultInitialState = {
   selectedService: null,
   selectedDoctor: null,
   selectedDateTime: null,
   patientInfo: null,
 };
 
-export const BookingProvider = ({ children }) => {
+export const BookingProvider = ({ children, initialService = null }) => {
+  const initialState = {
+    ...defaultInitialState,
+    selectedService: initialService,
+  };
+  
   const [state, dispatch] = useReducer(bookingReducer, initialState);
 
   return (
