@@ -7,12 +7,21 @@ import {supabase} from "@/lib/supabase/client";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi2";
 
 function SliderButton({ direction, onClick }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <button
       onClick={onClick}
       style={{
-        width: "48px",
-        height: "48px",
+        width: "clamp(40px, 5vw, 48px)",
+        height: "clamp(40px, 5vw, 48px)",
         borderRadius: "50%",
         backgroundColor: "#fff",
         border: "none",
@@ -22,12 +31,13 @@ function SliderButton({ direction, onClick }) {
         cursor: "pointer",
         boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         flexShrink: 0,
+        zIndex: 10,
       }}
     >
       {direction === "left" ? (
-        <HiOutlineArrowLeft size={24} color="var(--color-primary)" />
+        <HiOutlineArrowLeft size={isMobile ? 20 : 24} color="var(--color-primary)" />
       ) : (
-        <HiOutlineArrowRight size={24} color="var(--color-primary)" />
+        <HiOutlineArrowRight size={isMobile ? 20 : 24} color="var(--color-primary)" />
       )}
     </button>
   );
@@ -35,6 +45,7 @@ function SliderButton({ direction, onClick }) {
 
 export default function ServicesSlider() {
   const [services, setServices] = useState([]);
+  const [showButtons, setShowButtons] = useState(true);
   const sliderRef = useRef(null);
 
   useEffect(() => {
@@ -50,9 +61,17 @@ export default function ServicesSlider() {
     fetchServices();
   }, []);
 
+  useEffect(() => {
+    const checkScreenSize = () => setShowButtons(window.innerWidth >= 640);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   const scroll = (direction) => {
     if (!sliderRef.current) return;
-    const amount = 420;
+    const cardWidth = sliderRef.current.querySelector('div')?.offsetWidth || 420;
+    const amount = cardWidth + 16; // card width + gap
     sliderRef.current.scrollBy({
       left: direction === "left" ? -amount : amount,
       behavior: "smooth",
@@ -60,11 +79,11 @@ export default function ServicesSlider() {
   };
 
   return (
-    <section style={{ padding: "4rem 2rem" }}>
+    <section style={{ padding: "clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem)" }}>
       <TitleBlock
         titleStart="Découvrez notre"
         titleEnd="gamme de services de santé"
-        description="Nous offrons un large choix de solutions de santé, incluant le conseil, le diagnostic, la télémédecine, la rééducation et les consultations d’experts."
+        description="Nous offrons un large choix de solutions de santé, incluant le conseil, le diagnostic, la télémédecine, la rééducation et les consultations d'experts."
       />
 
       <div
@@ -72,21 +91,29 @@ export default function ServicesSlider() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "16px",
+          gap: "clamp(8px, 2vw, 16px)",
           marginTop: "3rem",
+          position: "relative",
+          width: "100%",
         }}
       >
-        <SliderButton direction="left" onClick={() => scroll("left")} />
+        {showButtons && (
+          <SliderButton direction="left" onClick={() => scroll("left")} />
+        )}
 
         <div
           ref={sliderRef}
+          className="no-scrollbar"
           style={{
             display: "flex",
-            gap: "16px",
-            overflow: "hidden",
+            gap: "clamp(12px, 2vw, 16px)",
+            overflowX: "auto",
+            overflowY: "hidden",
             scrollBehavior: "smooth",
             flexWrap: "nowrap",
-            width: "1243px",
+            width: "100%",
+            maxWidth: "1243px",
+            padding: "0 8px",
           }}
         >
           {services.map((service) => (
@@ -101,7 +128,9 @@ export default function ServicesSlider() {
           ))}
         </div>
 
-        <SliderButton direction="right" onClick={() => scroll("right")} />
+        {showButtons && (
+          <SliderButton direction="right" onClick={() => scroll("right")} />
+        )}
       </div>
     </section>
   );

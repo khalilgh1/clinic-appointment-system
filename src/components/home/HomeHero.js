@@ -1,9 +1,23 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { HiOutlineArrowRight } from "react-icons/hi2";
 
 export default function HomeHero() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth < 1024 && window.innerWidth >= 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <section
       style={{
@@ -14,30 +28,39 @@ export default function HomeHero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
+        padding: isMobile ? '1rem' : '2rem',
       }}
     >
       <div
         style={{
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
           maxWidth: '1200px',
-          gap: '3rem',
+          gap: isMobile ? '2rem' : '3rem',
           width: '100%',
-          padding: '2rem',
-          borderRadius: '24px', // rounded corners of main green card
+          padding: isMobile ? '1.5rem' : '2rem',
+          borderRadius: '24px',
         }}
       >
         {/* Left text content */}
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: '68px', lineHeight: '1.1', margin: 0 }}>
+        <div style={{ flex: 1, width: '100%', order: isMobile ? 2 : 1 }}>
+          <h1 style={{ 
+            fontSize: isMobile ? '32px' : isTablet ? '48px' : '68px', 
+            lineHeight: '1.1', 
+            margin: 0 
+          }}>
             <span style={{ fontFamily: 'var(--font-pacifico)', color: 'var(--color-secondary)' }}>
               Solutions de santé modernes
             </span>{' '}
             qui vous placent au centre.
           </h1>
 
-          <p style={{ fontSize: '18px', marginTop: '1.5rem', color: '#fff' }}>
+          <p style={{ 
+            fontSize: isMobile ? '16px' : '18px', 
+            marginTop: '1.5rem', 
+            color: '#fff' 
+          }}>
             Des bilans de routine aux traitements spécialisés, nous allions technologie moderne et approche humaine pour préserver la santé de vos proches.
           </p>
 
@@ -46,12 +69,12 @@ export default function HomeHero() {
             <button
               style={{
                 marginTop: '2rem',
-                fontSize: '20px',
-                color: 'var(--color-primary)', // green text
-                backgroundColor: '#fff', // white background
-                padding: '0.8rem 2rem',
+                fontSize: isMobile ? '16px' : '20px',
+                color: 'var(--color-primary)',
+                backgroundColor: '#fff',
+                padding: isMobile ? '0.6rem 1.5rem' : '0.8rem 2rem',
                 border: 'none',
-                borderRadius: '999px', // fully rounded
+                borderRadius: '999px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
                 display: 'inline-flex',
@@ -62,29 +85,36 @@ export default function HomeHero() {
               Prendre rendez-vous
               <span
                 style={{
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: 'var(--color-primary)', // green circle
+                  width: isMobile ? '28px' : '32px',
+                  height: isMobile ? '28px' : '32px',
+                  backgroundColor: 'var(--color-primary)',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <HiOutlineArrowRight color="#fff" size={20} />
+                <HiOutlineArrowRight color="#fff" size={isMobile ? 18 : 20} />
               </span>
             </button>
           </Link>
         </div>
 
         {/* Right image */}
-        <div style={{ flex: 1 }}>
+        <div style={{ 
+          flex: 1, 
+          width: '100%', 
+          order: isMobile ? 1 : 2,
+          maxWidth: isMobile ? '100%' : 'none'
+        }}>
           <img
             src="/doctor.png"
             alt="Doctor"
             style={{
               width: '100%',
-              borderRadius: '24px', // rounded corners
+              height: 'auto',
+              maxHeight: isMobile ? '300px' : 'none',
+              borderRadius: '24px',
               objectFit: 'cover',
             }}
           />

@@ -1,19 +1,29 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiPlus, HiMinus } from "react-icons/hi";
 
 export default function FAQCard({ question, answer }) {
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   return (
     <div
       style={{
-        width: "880px",
+        width: "100%",
+        maxWidth: "880px",
         backgroundColor: "#F5F7F8",
         borderRadius: "24px",
-        padding: "20px 24px",
+        padding: "clamp(16px, 3vw, 20px) clamp(18px, 3vw, 24px)",
         margin: "12px auto",
         cursor: "pointer",
+        boxSizing: "border-box",
       }}
       onClick={() => setOpen(!open)}
     >
@@ -23,14 +33,16 @@ export default function FAQCard({ question, answer }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "12px",
         }}
       >
         <h3
           style={{
-            fontSize: "16px",
+            fontSize: "clamp(14px, 2vw, 16px)",
             fontWeight: "700",
             color: "#010B0C",
             margin: 0,
+            flex: 1,
           }}
         >
           {question}
@@ -39,8 +51,8 @@ export default function FAQCard({ question, answer }) {
         {/* Toggle button */}
         <div
           style={{
-            width: "32px",
-            height: "32px",
+            width: "clamp(28px, 4vw, 32px)",
+            height: "clamp(28px, 4vw, 32px)",
             borderRadius: "50%",
             backgroundColor: open ? "#0A8A7B" : "#FFFFFF",
             display: "flex",
@@ -51,9 +63,9 @@ export default function FAQCard({ question, answer }) {
           }}
         >
           {open ? (
-            <HiMinus size={20} color="#FFFFFF" />
+            <HiMinus size={isMobile ? 18 : 20} color="#FFFFFF" />
           ) : (
-            <HiPlus size={20} color="#0A8A7B" />
+            <HiPlus size={isMobile ? 18 : 20} color="#0A8A7B" />
           )}
         </div>
       </div>
@@ -63,7 +75,7 @@ export default function FAQCard({ question, answer }) {
         <p
           style={{
             marginTop: "12px",
-            fontSize: "16px",
+            fontSize: "clamp(14px, 2vw, 16px)",
             color: "#555",
             lineHeight: "1.4",
           }}
