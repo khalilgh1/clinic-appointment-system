@@ -79,7 +79,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
   }
 
   return (
-    <div>
+    <div className="pb-32">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
         Choisissez la date et l'heure
       </h1>
@@ -90,10 +90,10 @@ const Step3Schedule = ({ onNext, onBack }) => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         
         {/* Section Calendrier */}
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="bg-white rounded-lg p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
               <Calendar className="w-5 h-5" />
@@ -126,7 +126,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
         </div>
 
         {/* Section hours */}
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="bg-white rounded-lg p-5 sm:p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-primary mb-6 flex items-center gap-2">
             <Clock className="w-5 h-5" />
             Horaires disponibles
@@ -314,7 +314,7 @@ const CalendarGrid = ({ currentMonth, availableDates, selectedDate, onDateSelect
 // hours grid component
 const TimeSlotsGrid = ({ availableTimes, selectedTime, onTimeSelect }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
       {availableTimes.map(time => (
         <button
           key={time}

@@ -92,7 +92,7 @@ const Step1Service = ({ onNext }) => {
   }
 
   return (
-    <div className="h-auto overflow-hidden">
+    <div className="h-auto overflow-hidden pb-28">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
         Sélectionnez un service
       </h1>
@@ -110,10 +110,10 @@ const Step1Service = ({ onNext }) => {
           Aucun service disponible pour le moment
         </div>
       ) : (
-        <div className="relative px-20">
+        <div className="relative px-3 sm:px-6 md:px-12 lg:px-20">
           {/* Carousel Container - 2x2 Grid */}
           <div className="overflow-hidden" ref={carouselRef}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-11">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 md:gap-x-10 gap-y-8 md:gap-y-11">
               {currentServices.map(service => {
                 const isSelected = state.selectedService?.id === service.id;
                 
@@ -136,9 +136,9 @@ const Step1Service = ({ onNext }) => {
               <button
                 onClick={goToPrevious}
                 disabled={!canGoPrevious}
-                className={`absolute -left-1 top-1/2 -translate-y-1/2 z-10
-                          w-12 h-12 rounded-full bg-white shadow-lg
-                          flex items-center justify-center
+                className={`hidden sm:flex absolute -left-1 md:-left-3 lg:-left-1 top-1/2 -translate-y-1/2 z-10
+                          w-11 h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg
+                          items-center justify-center
                           transition-all duration-200
                           ${canGoPrevious 
                             ? 'hover:bg-gray-100 hover:shadow-xl cursor-pointer' 
@@ -152,9 +152,9 @@ const Step1Service = ({ onNext }) => {
               <button
                 onClick={goToNext}
                 disabled={!canGoNext}
-                className={`absolute -right-1 top-1/2 -translate-y-1/2 z-10
-                          w-12 h-12 rounded-full bg-white shadow-lg
-                          flex items-center justify-center
+                className={`hidden sm:flex absolute -right-1 md:-right-3 lg:-right-1 top-1/2 -translate-y-1/2 z-10
+                          w-11 h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg
+                          items-center justify-center
                           transition-all duration-200
                           ${canGoNext 
                             ? 'hover:bg-gray-100 hover:shadow-xl cursor-pointer' 

@@ -85,7 +85,7 @@ const Step2Doctor = ({ onNext, onBack }) => {
   }
 
   return (
-    <div className="h-auto overflow-hidden">
+    <div className="h-auto overflow-hidden pb-28">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
         Sélectionnez votre médecin
       </h1>
@@ -95,7 +95,7 @@ const Step2Doctor = ({ onNext, onBack }) => {
           Aucun médecin disponible pour ce service
         </div>
       ) : (
-        <div className="relative px-20">
+        <div className="relative px-3 sm:px-6 md:px-12 lg:px-20">
           {/* Carousel Container - 2x2 Grid */}
           <div className="overflow-hidden" ref={carouselRef}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -117,9 +117,9 @@ const Step2Doctor = ({ onNext, onBack }) => {
               <button
                 onClick={goToPrevious}
                 disabled={!canGoPrevious}
-                className={`absolute -left-16 top-1/2 -translate-y-1/2 z-10
-                          w-12 h-12 rounded-full bg-white shadow-lg
-                          flex items-center justify-center
+                className={`hidden sm:flex absolute -left-4 md:-left-12 lg:-left-16 top-1/2 -translate-y-1/2 z-10
+                          w-11 h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg
+                          items-center justify-center
                           transition-all duration-200
                           ${canGoPrevious 
                             ? 'hover:bg-gray-100 hover:shadow-xl cursor-pointer' 
@@ -133,9 +133,9 @@ const Step2Doctor = ({ onNext, onBack }) => {
               <button
                 onClick={goToNext}
                 disabled={!canGoNext}
-                className={`absolute -right-16 top-1/2 -translate-y-1/2 z-10
-                          w-12 h-12 rounded-full bg-white shadow-lg
-                          flex items-center justify-center
+                className={`hidden sm:flex absolute -right-4 md:-right-12 lg:-right-16 top-1/2 -translate-y-1/2 z-10
+                          w-11 h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg
+                          items-center justify-center
                           transition-all duration-200
                           ${canGoNext 
                             ? 'hover:bg-gray-100 hover:shadow-xl cursor-pointer' 

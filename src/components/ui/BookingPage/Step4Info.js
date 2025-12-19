@@ -252,7 +252,7 @@ const Step4Info = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto pb-32">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
         Informations personnelles
       </h1>

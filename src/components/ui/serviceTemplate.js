@@ -266,7 +266,7 @@ export default function ServiceTemplate({ service }) {
   return (
     <div className="min-h-screen bg-[#F4F7F9]">
       {/* HERO SECTION */}
-  <div className="relative w-full h-[360px] md:h-[420px] lg:h-[600px] overflow-hidden">
+  <div className="relative w-full h-[320px] md:h-[420px] lg:h-[560px] overflow-hidden">
         {service.image && (
           <div
             className="absolute inset-0 bg-cover bg-center"
