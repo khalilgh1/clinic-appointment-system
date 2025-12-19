@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
 
 const ClockIcon = ({ className }) => (
   <svg
@@ -20,6 +21,92 @@ const ClockIcon = ({ className }) => (
 );
 
 export default function ServiceTemplate({ service }) {
+  // --- Weekly hours (computed from doctor schedules) ---
+  const [weeklyHours, setWeeklyHours] = useState(null);
+  const [loadingHours, setLoadingHours] = useState(false);
+
+  useEffect(() => {
+    const fetchWeeklyHours = async () => {
+      if (!service?.service_id) return;
+      setLoadingHours(true);
+      try {
+        const sb = supabase();
+        const { data: linkedDoctors, error: linkErr } = await sb
+          .from("doctor_services")
+          .select("doctor_id")
+          .eq("service_id", service.service_id);
+
+        if (linkErr) throw linkErr;
+        if (!linkedDoctors || linkedDoctors.length === 0) {
+          setWeeklyHours([]);
+          setLoadingHours(false);
+          return;
+        }
+
+        const doctorIds = linkedDoctors.map((d) => d.doctor_id);
+
+        const { data: schedules, error: schedErr } = await sb
+          .from("doctor_schedule")
+          .select("doctor_id, day_of_week, start_time, end_time")
+          .in("doctor_id", doctorIds);
+
+        if (schedErr) throw schedErr;
+
+        // Compute earliest start and latest end per weekday
+        const toMinutes = (t) => {
+          if (!t) return null;
+          const [hh, mm, ss] = t.split(":");
+          return parseInt(hh, 10) * 60 + parseInt(mm, 10);
+        };
+        const fmt = (mins) => {
+          const h = Math.floor(mins / 60);
+          const m = mins % 60;
+          const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
+          return `${pad(h)}:${pad(m)}`;
+        };
+
+        const days = Array.from({ length: 7 }, () => ({ earliest: null, latest: null }));
+        (schedules || []).forEach((row) => {
+          const d = row.day_of_week ?? null;
+          if (d === null || d < 0 || d > 6) return;
+          const start = toMinutes(row.start_time);
+          const end = toMinutes(row.end_time);
+          if (start == null || end == null) return;
+          if (days[d].earliest === null || start < days[d].earliest) days[d].earliest = start;
+          if (days[d].latest === null || end > days[d].latest) days[d].latest = end;
+        });
+
+        const dayNames = [
+          "Dimanche",
+          "Lundi",
+          "Mardi",
+          "Mercredi",
+          "Jeudi",
+          "Vendredi",
+          "Samedi",
+        ];
+
+        const summary = days
+          .map((rng, idx) => {
+            if (rng.earliest == null || rng.latest == null) return null;
+            return {
+              day: dayNames[idx],
+              range: `${fmt(rng.earliest)} - ${fmt(rng.latest)}`,
+            };
+          })
+          .filter(Boolean);
+
+        setWeeklyHours(summary);
+      } catch (e) {
+        console.error("Failed to load weekly hours:", e);
+        setWeeklyHours([]);
+      } finally {
+        setLoadingHours(false);
+      }
+    };
+
+    fetchWeeklyHours();
+  }, [service?.service_id]);
   // Safely parse JSONB fields
   const parseJsonField = (field) => {
     if (!field) return [];
@@ -296,21 +383,19 @@ export default function ServiceTemplate({ service }) {
                 <h3 className="text-lg font-bold">Horaires d'ouverture</h3>
               </div>
 
-              <div className="mb-8 space-y-1">
-                {service.opening_days || service.openingDays || service.days ? (
-                  <p className="text-gray-200 text-sm">
-                    {service.opening_days || service.openingDays || service.days}
-                  </p>
-                ) : null}
-
-                {service.opening_hours || service.openingHours || service.hours ? (
-                  <p className="text-2xl font-bold tracking-wide">
-                    {service.opening_hours || service.openingHours || service.hours}
-                  </p>
-                ) : null}
-
-                {!service.opening_days && !service.openingDays && !service.days &&
-                 !service.opening_hours && !service.openingHours && !service.hours && (
+              <div className="mb-8 space-y-2">
+                {loadingHours ? (
+                  <p className="text-gray-200 text-sm">Chargement des horaires…</p>
+                ) : weeklyHours && weeklyHours.length > 0 ? (
+                  <ul className="space-y-1">
+                    {weeklyHours.map((row, idx) => (
+                      <li key={idx} className="flex justify-between text-sm">
+                        <span className="text-gray-200">{row.day}</span>
+                        <span className="font-semibold">{row.range}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
                   <p className="text-gray-200 text-sm">
                     Consultez les disponibilités en temps réel lors de la réservation.
                   </p>
