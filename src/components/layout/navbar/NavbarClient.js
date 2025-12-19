@@ -45,8 +45,8 @@ export default function NavbarClient({ children, theme = 'theme1' }) {
 
   const menuContent = (
     <div
-      className={`lg:hidden fixed inset-0 bg-[var(--color-bg-primary)] z-[100] transition-all duration-300 ease-in-out overflow-y-auto ${
-        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+      className={`lg:hidden fixed inset-0 bg-[var(--color-bg-primary)] z-[100] transition-transform duration-300 ease-in-out overflow-y-auto ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
       {/* Menu Content - positioned below navbar */}
