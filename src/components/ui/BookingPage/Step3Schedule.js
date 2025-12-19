@@ -201,26 +201,28 @@ const Step3Schedule = ({ onNext, onBack }) => {
       )}
 
       {/* Navigation */}
-      <div className="mt-8 flex justify-between">
-        <button
-          onClick={onBack}
-          className="bg-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          RETOUR
-        </button>
-        <button
-          onClick={handleNext}
-          disabled={!selectedDate || !selectedTime}
-          className={`font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
-            selectedDate && selectedTime
-              ? 'bg-secondary text-primary hover:bg-secondary/90' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          ÉTAPE SUIVANTE
-          <ArrowRight className="w-5 h-5" />
-        </button>
+      <div className="fixed bottom-4 left-0 right-0 z-40 pointer-events-none flex justify-center px-4">
+        <div className="w-full max-w-4xl bg-white/95 backdrop-blur border border-gray-200 shadow-[0_-8px_24px_rgba(0,0,0,0.12)] rounded-xl px-4 py-3 pointer-events-auto flex items-center justify-between gap-3">
+          <button
+            onClick={onBack}
+            className="bg-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            RETOUR
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={!selectedDate || !selectedTime}
+            className={`font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
+              selectedDate && selectedTime
+                ? 'bg-secondary text-primary hover:bg-secondary/90' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            ÉTAPE SUIVANTE
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
