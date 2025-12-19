@@ -22,8 +22,13 @@ const BookingFlow = ({ initialStep }) => {
 
   console.log('BookingFlow render: initialStep =', initialStep, ', currentStep =', currentStep);
 
+  const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
 
   const goNext = () => {
+    scrollToTop();
     if (currentStep === 4) {
       setShowFinalization(true);
     } else {
@@ -32,10 +37,12 @@ const BookingFlow = ({ initialStep }) => {
   };
 
   const goBack = () => {
+    scrollToTop();
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
   };
+
 
   const handleReturnHome = () => {
   // Reset State
