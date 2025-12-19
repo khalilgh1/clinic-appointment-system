@@ -229,20 +229,22 @@ export default function DoctorsPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Nos Médecins</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">Nos Médecins</h1>
             <p className="text-gray-600">
               Chaque spécialiste travaille en étroite coordination pour assurer un suivi global, précis et bienveillant.
             </p>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
-          >
-            <UserPlus size={20} />
-            Ajouter un médecin
-          </button>
+          <div className="w-full sm:w-auto">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
+            >
+              <UserPlus size={20} />
+              Ajouter un médecin
+            </button>
+          </div>
         </div>
 
         {/* Doctors Grid */}
