@@ -37,10 +37,10 @@ const STATUS_DESCRIPTIONS = {
 }
 
 const STATUS_PALETTE = [
-    { border: "border-[#C7DEFF]", bg: "bg-[#F5F9FF]", text: "text-[#1A4C81]" },
-    { border: "border-[#F8D8AA]", bg: "bg-[#FFF9F0]", text: "text-[#A16106]" },
-    { border: "border-[#B8F0C5]", bg: "bg-[#F1FFF6]", text: "text-[#0F8A3D]" },
-    { border: "border-[#FFC7C7]", bg: "bg-[#FFF5F5]", text: "text-[#B42318]" },
+    { border: "border-[#C7DEFF]", bg: "bg-[#F5F9FF]", text: "text-[#1A4C81]", ring: "ring-[#C7DEFF]" },
+    { border: "border-[#F8D8AA]", bg: "bg-[#FFF9F0]", text: "text-[#A16106]", ring: "ring-[#F8D8AA]" },
+    { border: "border-[#B8F0C5]", bg: "bg-[#F1FFF6]", text: "text-[#0F8A3D]", ring: "ring-[#B8F0C5]" },
+    { border: "border-[#FFC7C7]", bg: "bg-[#FFF5F5]", text: "text-[#B42318]", ring: "ring-[#FFC7C7]" },
 ]
 
 const normalizeStatus = (value) => (value ?? "").toString().toLowerCase()
@@ -135,6 +135,7 @@ export default function AppointmentPage() {
                 border: "border-transparent",
                 bg: "bg-primary",
                 text: "text-white",
+                ring: "ring-[#1A4C81]",
             },
             ...dynamicStatuses.map((value, index) => {
                 const palette = STATUS_PALETTE[index % STATUS_PALETTE.length]
@@ -210,8 +211,12 @@ export default function AppointmentPage() {
                             key={`${card.value || "all"}-${index}`}
                             type="button"
                             onClick={() => setStatusFilter(card.value)}
-                            className={`rounded-2xl border ${card.border} ${card.bg} ${card.text} px-5 py-4 text-left shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${isActive ? "ring-2 ring-offset-2 ring-secondary" : "ring-1 ring-transparent"
-                                }`}
+                            className={
+                                `rounded-2xl border ${card.border} ${card.bg} ${card.text}
+                             px-5 py-4 text-left shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary
+                                                            ${isActive ? `ring-2 ring-offset-2 ${card.ring}` : "ring-1 ring-transparent"}
+                                                                `
+                            }
                         >
                             <span className={`text-sm font-medium ${card.value === "" ? "opacity-90" : "opacity-80"}`}>{card.label}</span>
                             <span className="text-2xl font-semibold mt-2 ml-3">{count}</span>
