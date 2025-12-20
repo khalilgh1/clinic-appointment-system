@@ -20,7 +20,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex">
       {/* Sidebar (desktop) */}
-      <aside className="hidden md:block bg-primary text-white w-max md:w-64 lg:w-72 h-screen sticky top-0">
+      <aside className="hidden md:block bg-primary text-white md:w-64 lg:w-72 h-screen fixed">
         <Sidebar />
       </aside>
 
@@ -74,7 +74,7 @@ export default function AdminLayout({ children }) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-100 w-full">
+      <main className="flex-1 bg-gray-100 w-full min-h-screen md:ml-64 lg:ml-72">
         {/* Constrain content width and center to avoid 'zoomed' feeling */}
         <div className="w-full max-w-[1200px] mx-auto px-4 py-8">
           {children}

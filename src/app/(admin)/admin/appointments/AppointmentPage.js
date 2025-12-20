@@ -43,6 +43,8 @@ const STATUS_PALETTE = [
     { border: "border-[#FFC7C7]", bg: "bg-[#FFF5F5]", text: "text-[#B42318]", ring: "ring-[#FFC7C7]" },
 ]
 
+const PAGE_SIZE = 10
+
 const normalizeStatus = (value) => (value ?? "").toString().toLowerCase()
 
 const formatStatus = (value) => {
@@ -66,6 +68,7 @@ export default function AppointmentPage() {
     const [dateFilter, setDateFilter] = useState("")
     const [doctors, setDoctors] = useState([])
     const [services, setServices] = useState([])
+    const [page, setPage] = useState(1)
 
     const fetchAppointments = useCallback(async () => {
         try {
@@ -110,6 +113,11 @@ export default function AppointmentPage() {
     useEffect(() => {
         fetchAppointments()
     }, [doctorFilter, serviceFilter, dateFilter, fetchAppointments])
+
+    // Reset paging whenever filters or search change
+    useEffect(() => {
+        setPage(1)
+    }, [search, statusFilter, doctorFilter, serviceFilter, dateFilter])
 
     const statuses = useMemo(() => {
         const set = new Set(appointments.map((a) => a.status).filter(Boolean))
@@ -168,6 +176,10 @@ export default function AppointmentPage() {
             return matchesSearch && matchesStatus && matchesDoctor && matchesService && matchesDate
         })
     }, [appointments, search, statusFilter, doctorFilter, serviceFilter, dateFilter])
+
+    const displayed = useMemo(() => {
+        return filtered.slice(0, page * PAGE_SIZE)
+    }, [filtered, page])
 
     async function updateStatus(id, newStatus) {
         try {
@@ -322,7 +334,7 @@ export default function AppointmentPage() {
                                 </td>
                             </tr>
                         ) : (
-                            filtered.map((a) => (
+                            displayed.map((a) => (
                                 <tr key={a.appointment_id} className="border-t border-gray-400">
                                     <td className="p-3">{a.appointment_id}</td>
                                     <td className="p-3">
@@ -363,6 +375,19 @@ export default function AppointmentPage() {
                     </tbody>
                 </table>
             </div>
+            {/* Show more button for manual lazy loading */}
+            {displayed.length < filtered.length && (
+                <div className="mt-4 flex justify-center">
+                    <button
+                        type="button"
+                        onClick={() => setPage((p) => p + 1)}
+                        disabled={loading}
+                        className="px-4 py-2 bg-primary text-white rounded-lg shadow-sm hover:opacity-95 disabled:opacity-60"
+                    >
+                        Show more
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

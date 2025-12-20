@@ -239,7 +239,7 @@ export default function DoctorsPage() {
           <div className="w-full sm:w-auto">
             <button
               onClick={() => setShowAddModal(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition"
             >
               <UserPlus size={20} />
               Ajouter un médecin
