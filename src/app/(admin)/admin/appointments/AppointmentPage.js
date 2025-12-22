@@ -177,9 +177,34 @@ export default function AppointmentPage() {
         })
     }, [appointments, search, statusFilter, doctorFilter, serviceFilter, dateFilter])
 
+    const totalPages = useMemo(() => {
+        return Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+    }, [filtered])
+
     const displayed = useMemo(() => {
-        return filtered.slice(0, page * PAGE_SIZE)
+        const start = (page - 1) * PAGE_SIZE
+        return filtered.slice(start, start + PAGE_SIZE)
     }, [filtered, page])
+
+    // Compute the middle pages (excluding first and last) and ellipses markers
+    const middlePages = useMemo(() => {
+        const pages = []
+        if (totalPages <= 7) {
+            for (let i = 2; i <= Math.max(1, totalPages - 1); i++) pages.push(i)
+            return pages
+        }
+
+        const left = Math.max(2, page - 1)
+        const right = Math.min(totalPages - 1, page + 1)
+
+        if (left > 2) pages.push("left-ellipsis")
+
+        for (let i = left; i <= right; i++) pages.push(i)
+
+        if (right < totalPages - 1) pages.push("right-ellipsis")
+
+        return pages
+    }, [page, totalPages])
 
     async function updateStatus(id, newStatus) {
         try {
@@ -375,17 +400,78 @@ export default function AppointmentPage() {
                     </tbody>
                 </table>
             </div>
-            {/* Show more button for manual lazy loading */}
-            {displayed.length < filtered.length && (
-                <div className="mt-4 flex justify-center">
-                    <button
-                        type="button"
-                        onClick={() => setPage((p) => p + 1)}
-                        disabled={loading}
-                        className="px-4 py-2 bg-primary text-white rounded-lg shadow-sm hover:opacity-95 disabled:opacity-60"
-                    >
-                        Show more
-                    </button>
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                    <nav className="w-90  bg-white border border-gray-200 rounded-2xl shadow-sm px-2 py-2 flex items-center justify-between">
+                        <button
+                            type="button"
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            className="w-8 h-8 flex items-center justify-center rounded-md text-lg hover:bg-gray-100 disabled:opacity-50"
+                            aria-label="Previous page"
+                        >
+                            ‹
+                        </button>
+
+                        <div className="flex items-center gap-1 mx-1">
+                            {/* First page - always visible */}
+                            <button
+                                type="button"
+                                onClick={() => setPage(1)}
+                                className={`min-w-[32px] w-8 h-8 flex items-center justify-center rounded-md text-sm transition ${page === 1 ? "bg-primary text-white shadow" : "bg-transparent hover:bg-gray-50 text-gray-700"}`}
+                                aria-current={page === 1 ? "page" : undefined}
+                            >
+                                1
+                            </button>
+
+                            <div className="flex-1 flex items-center justify-center gap-1 overflow-hidden">
+                                {middlePages.map((item, idx) => {
+                                    if (item === "left-ellipsis" || item === "right-ellipsis") {
+                                        return (
+                                            <span key={`e-${idx}`} className="px-1 text-sm text-gray-400 select-none">
+                                                …
+                                            </span>
+                                        )
+                                    }
+
+                                    const pn = item
+                                    const isActive = pn === page
+                                    return (
+                                        <button
+                                            key={pn}
+                                            type="button"
+                                            onClick={() => setPage(pn)}
+                                            className={`min-w-[32px] w-8 h-8 flex items-center justify-center mx-0.5 rounded-md text-sm transition ${isActive ? "bg-primary text-white shadow" : "bg-transparent hover:bg-gray-50 text-gray-700"}`}
+                                            aria-current={isActive ? "page" : undefined}
+                                        >
+                                            {pn}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Last page - always visible */}
+                            <button
+                                type="button"
+                                onClick={() => setPage(totalPages)}
+                                className={`min-w-[32px] w-8 h-8 flex items-center justify-center rounded-md text-sm transition ${page === totalPages ? "bg-primary text-white shadow" : "bg-transparent hover:bg-gray-50 text-gray-700"}`}
+                                aria-current={page === totalPages ? "page" : undefined}
+                            >
+                                {totalPages}
+                            </button>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            className="w-8 h-8 flex items-center justify-center rounded-md text-lg hover:bg-gray-100 disabled:opacity-50"
+                            aria-label="Next page"
+                        >
+                            ›
+                        </button>
+                    </nav>
                 </div>
             )}
         </div>
