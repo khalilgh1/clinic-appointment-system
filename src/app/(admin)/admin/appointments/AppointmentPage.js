@@ -1,8 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { supabase as createClient } from "@/lib/supabase/client"
 import ConfirmModal from '@/components/modals/ConfirmModal'
+import ErrorModal from '@/components/modals/ErrorModal'
 import { Funnel } from "lucide-react"
 
 
@@ -59,7 +59,8 @@ const formatStatus = (value) => {
 }
 
 export default function AppointmentPage() {
-    const sb = useMemo(() => createClient(), [])
+    // No client-side Supabase here — all appointment, doctor and service fetching
+    // is performed via server routes under `/api/*`.
     const [appointments, setAppointments] = useState([])
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState("")
@@ -75,41 +76,46 @@ export default function AppointmentPage() {
     const fetchAppointments = useCallback(async () => {
         try {
             setLoading(true)
-            const { data, error } = await sb.from("appointment").select("*")
-            if (error) throw error
-            setAppointments(Array.isArray(data) ? data : [])
+            const res = await fetch('/api/appointments')
+            const json = await res.json()
+            if (!res.ok) throw json.error || new Error('Failed to fetch appointments')
+            setAppointments(Array.isArray(json.appointments) ? json.appointments : [])
         } catch (err) {
             console.error("Error loading appointments", err)
         } finally {
             setLoading(false)
         }
-    }, [sb])
+    }, [])
 
     const fetchDoctors = useCallback(async () => {
         try {
-            const { data, error } = await sb.from("doctor").select("doctor_id, name")
-            if (error) throw error
-            setDoctors(Array.isArray(data) ? data : [])
+            const res = await fetch('/api/doctors')
+            const json = await res.json()
+            if (!res.ok) throw json.error || new Error('Failed to fetch doctors')
+            const doctorsData = json.doctors ?? json.data ?? json
+            setDoctors(Array.isArray(doctorsData) ? doctorsData : [])
         } catch (err) {
             console.error("Error loading doctors", err)
         }
-    }, [sb])
+    }, [])
 
     const fetchServices = useCallback(async () => {
         try {
-            const { data, error } = await sb.from("service").select("service_id, name")
-            if (error) throw error
-            setServices(Array.isArray(data) ? data : [])
+            const res = await fetch('/api/services')
+            const json = await res.json()
+            if (!res.ok) throw json.error || new Error('Failed to fetch services')
+            const servicesData = json.services ?? json.data ?? json
+            setServices(Array.isArray(servicesData) ? servicesData : [])
         } catch (err) {
             console.error("Error loading services", err)
         }
-    }, [sb])
+    }, [])
 
     useEffect(() => {
         fetchAppointments()
         fetchDoctors()
         fetchServices()
-    }, [fetchAppointments])
+    }, [fetchAppointments, fetchDoctors, fetchServices])
 
     // Re-fetch when filters change so the list is fresh after a selection
     useEffect(() => {
@@ -208,14 +214,21 @@ export default function AppointmentPage() {
         return pages
     }, [page, totalPages])
 
+    const [errorModal, setErrorModal] = useState(null)
+
     async function updateStatus(id, newStatus) {
         try {
-            const { error } = await sb.from("appointment").update({ status: newStatus }).eq("appointment_id", id)
-            if (error) throw error
+            const res = await fetch('/api/appointments', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update-status', appointment_id: id, status: newStatus }),
+            })
+            const json = await res.json()
+            if (!res.ok) throw json.error || new Error('Failed to update status')
             setAppointments((prev) => prev.map((p) => (p.appointment_id === id ? { ...p, status: newStatus } : p)))
         } catch (err) {
             console.error("Failed to update status", err)
-            alert("Failed to update status")
+            setErrorModal({ title: 'Erreur', message: (err && err.message) || String(err) })
         }
     }
 
@@ -228,12 +241,19 @@ export default function AppointmentPage() {
         if (!pendingDeleteAppointment) return
         const id = pendingDeleteAppointment.appointment_id
         try {
-            const { error } = await sb.from("appointment").delete().eq("appointment_id", id)
-            if (error) throw error
+            const res = await fetch('/api/appointments', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ appointment_id: id }),
+            })
+            console.log("Deleting appointment ID:", id)
+            console.log("Response:", res)
+            const json = await res.json()
+            if (!res.ok) throw json.error || new Error('Failed to delete')
             setAppointments((prev) => prev.filter((p) => p.appointment_id !== id))
         } catch (err) {
             console.error("Failed to delete", err)
-            alert("Failed to delete appointment")
+            setErrorModal({ title: 'Erreur', message: (err && err.message) || String(err) })
         } finally {
             setPendingDeleteAppointment(null)
         }
@@ -500,6 +520,13 @@ export default function AppointmentPage() {
                     cancelLabel="Annuler"
                     onConfirm={performDeleteAppointment}
                     onCancel={() => setPendingDeleteAppointment(null)}
+                />
+            )}
+            {errorModal && (
+                <ErrorModal
+                    title={errorModal.title}
+                    message={errorModal.message}
+                    onClose={() => setErrorModal(null)}
                 />
             )}
         </div>
