@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client';
 import AddServiceModal from '@/components/modals/AddServiceModal'
 import EditServiceModal from '@/components/modals/EditServiceModal'
+import ConfirmModal from '@/components/modals/ConfirmModal'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 
 
@@ -18,6 +19,7 @@ export default function ServicesPage() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
     const [selectedService, setSelectedService] = useState(null)
+    const [pendingDeleteService, setPendingDeleteService] = useState(null)
 
     const [formData, setFormData] = useState({
         name: '',
@@ -131,7 +133,14 @@ export default function ServicesPage() {
     }
 
     async function handleDeleteService(id) {
-        if (!confirm('Are you sure you want to delete this service?')) return
+        // show confirmation modal
+        const svc = services.find(s => s.service_id === id) || { name: '' }
+        setPendingDeleteService({ service_id: id, name: svc.name })
+    }
+
+    async function performDeleteService() {
+        if (!pendingDeleteService) return
+        const id = pendingDeleteService.service_id
         try {
             setLoading(true)
             const sb = supabase()
@@ -142,6 +151,7 @@ export default function ServicesPage() {
             setError(err.message || String(err))
         } finally {
             setLoading(false)
+            setPendingDeleteService(null)
         }
     }
 
@@ -324,6 +334,16 @@ export default function ServicesPage() {
                     formData={formData}
                     setFormData={setFormData}
                     handleEditService={handleEditService}
+                />
+            )}
+            {pendingDeleteService && (
+                <ConfirmModal
+                    title="Supprimer le service"
+                    message={`Voulez-vous vraiment supprimer "${pendingDeleteService.name}" ? Cette action est irréversible.`}
+                    confirmLabel="Supprimer"
+                    cancelLabel="Annuler"
+                    onConfirm={performDeleteService}
+                    onCancel={() => setPendingDeleteService(null)}
                 />
             )}
         </div>

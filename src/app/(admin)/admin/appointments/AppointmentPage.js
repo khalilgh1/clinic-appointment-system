@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { supabase as createClient } from "@/lib/supabase/client"
+import ConfirmModal from '@/components/modals/ConfirmModal'
 import { Funnel } from "lucide-react"
 
 
@@ -69,6 +70,7 @@ export default function AppointmentPage() {
     const [doctors, setDoctors] = useState([])
     const [services, setServices] = useState([])
     const [page, setPage] = useState(1)
+    const [pendingDeleteAppointment, setPendingDeleteAppointment] = useState(null)
 
     const fetchAppointments = useCallback(async () => {
         try {
@@ -217,8 +219,14 @@ export default function AppointmentPage() {
         }
     }
 
-    async function removeAppointment(id) {
-        if (!confirm("Delete this appointment?")) return
+    function removeAppointment(id) {
+        const appt = appointments.find(a => a.appointment_id === id) || {}
+        setPendingDeleteAppointment({ appointment_id: id, label: `${appt.patient_first_name || ''} ${appt.patient_last_name || ''}`.trim() })
+    }
+
+    async function performDeleteAppointment() {
+        if (!pendingDeleteAppointment) return
+        const id = pendingDeleteAppointment.appointment_id
         try {
             const { error } = await sb.from("appointment").delete().eq("appointment_id", id)
             if (error) throw error
@@ -226,6 +234,8 @@ export default function AppointmentPage() {
         } catch (err) {
             console.error("Failed to delete", err)
             alert("Failed to delete appointment")
+        } finally {
+            setPendingDeleteAppointment(null)
         }
     }
 
@@ -481,6 +491,16 @@ export default function AppointmentPage() {
                         </button>
                     </nav>
                 </div>
+            )}
+            {pendingDeleteAppointment && (
+                <ConfirmModal
+                    title="Supprimer le rendez-vous"
+                    message={`Voulez-vous vraiment supprimer le rendez-vous de "${pendingDeleteAppointment.label || ''}" ? Cette action est irréversible.`}
+                    confirmLabel="Supprimer"
+                    cancelLabel="Annuler"
+                    onConfirm={performDeleteAppointment}
+                    onCancel={() => setPendingDeleteAppointment(null)}
+                />
             )}
         </div>
     )

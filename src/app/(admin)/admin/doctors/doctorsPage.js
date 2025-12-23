@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { UserPlus } from 'lucide-react';
-import { supabase } from '@/lib/supabase/client';
 import DoctorCard from '@/components/ui/doctor_card';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 // Modals
 import AddDoctorModal from '@/components/modals/AddDoctorModal';
@@ -27,48 +27,20 @@ export default function DoctorsPage() {
     email: '',
     is_active: true
   });
-  //supabase data loading: fetch doctors and their schedules, then merge
+  const [pendingDeleteDoctor, setPendingDeleteDoctor] = useState(null);
+  // fetch doctors and schedules via server API
   const fetchDoctors = async () => {
-    const { data: doctorsData, error: doctorsError } = await supabase().from('doctor').select('*');
-    const { data: schedulesData, error: schedulesError } = await supabase().from('doctor_schedule').select('*');
-
-    if (doctorsError) {
-      console.error('Error fetching doctors:', doctorsError);
-      return;
+    try {
+      const resp = await fetch('/api/doctors')
+      const json = await resp.json()
+      if (!resp.ok) {
+        console.error('Error fetching doctors:', json)
+        return
+      }
+      setDoctors(json.doctors || [])
+    } catch (err) {
+      console.error('fetchDoctors error:', err)
     }
-    if (schedulesError) {
-      console.error('Error fetching schedules:', schedulesError);
-      // we'll continue and attach empty schedules if schedules fail
-    }
-
-    // map numeric day_of_week -> French day names (assumes 1 = Lundi)
-    const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi',];
-
-    // build schedule map by doctor_id
-    const scheduleMap = {};
-    (schedulesData || []).forEach((s) => {
-      const did = s.doctor_id;
-      const idx = Number(s.day_of_week);
-      const dayName = dayNames[idx] || String(s.day_of_week);
-      // format time to HH:MM if present (supabase time may be '09:00:00')
-      const formatTime = (t) => (t ? String(t).substring(0, 5) : '');
-      const start = formatTime(s.start_time);
-      const end = formatTime(s.end_time);
-      if (!scheduleMap[did]) scheduleMap[did] = {};
-      scheduleMap[did][dayName] = { start, end };
-    });
-
-    const merged = (doctorsData || []).map((d) => ({
-      ...d,
-      // attach schedule object or empty object
-      schedule: scheduleMap[d.doctor_id] || {},
-      workDays: scheduleMap[d.doctor_id]
-        ? Object.keys(scheduleMap[d.doctor_id]).join(', ')
-        : 'Aucun jour de travail défini'
-    }));
-
-    setDoctors(merged);
-    console.log('Doctors with schedules:', merged);
   }
   useEffect(() => {
     fetchDoctors();
@@ -108,13 +80,19 @@ export default function DoctorsPage() {
             console.error('Error uploading image via server route:', err)
           }
         }
-        const { data: inserted, error: insertError } = await supabase().from('doctor').insert(toInsert).select().single();
-        if (insertError) {
-          console.error('Error inserting doctor:', insertError);
-          return;
+        const resp = await fetch('/api/doctors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: toInsert }),
+        })
+        const json = await resp.json()
+        if (!resp.ok) {
+          console.error('Error inserting doctor:', json)
+          return
         }
-        const newDoctor = { ...inserted, schedule: {}, workDays: '' };
-        setDoctors((prev) => [...prev, newDoctor]);
+        const inserted = json.doctor
+        const newDoctor = { ...inserted, schedule: {}, workDays: '' }
+        setDoctors((prev) => [...prev, newDoctor])
         setFormData({ name: '', specialty_name: '', profile_picture: '', profile_file: null, description: '', email: '', is_active: true });
         setShowAddModal(false);
       } catch (err) {
@@ -157,12 +135,18 @@ export default function DoctorsPage() {
             console.error('Error uploading image via server route:', err)
           }
         }
-        const { data: updated, error: updateError } = await supabase().from('doctor').update(updates).eq('doctor_id', selectedDoctor.doctor_id).select().single();
-        if (updateError) {
-          console.error('Error updating doctor:', updateError);
-          return;
+        const resp = await fetch('/api/doctors', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update', doctor_id: selectedDoctor.doctor_id, updates }),
+        })
+        const json = await resp.json()
+        if (!resp.ok) {
+          console.error('Error updating doctor:', json)
+          return
         }
-        setDoctors((prev) => prev.map((doc) => (doc.doctor_id === updated.doctor_id ? { ...doc, ...updated } : doc)));
+        const updated = json.doctor
+        setDoctors((prev) => prev.map((doc) => (doc.doctor_id === updated.doctor_id ? { ...doc, ...updated } : doc)))
         setFormData({ name: '', specialty_name: '', profile_picture: '', profile_file: null, description: '', email: '', is_active: true });
         setShowEditModal(false);
         setSelectedDoctor(null);
@@ -173,23 +157,33 @@ export default function DoctorsPage() {
   };
 
   const handleDeleteDoctor = (doctor_id) => {
-    (async () => {
-      try {
-        // delete schedules first
-        const { error: delSchedulesError } = await supabase().from('doctor_schedule').delete().eq('doctor_id', doctor_id);
-        if (delSchedulesError) console.error('Error deleting schedules:', delSchedulesError);
-        // delete doctor
-        const { error: delError } = await supabase().from('doctor').delete().eq('doctor_id', doctor_id);
-        if (delError) {
-          console.error('Error deleting doctor:', delError);
-          return;
-        }
-        setDoctors((prev) => prev.filter((doc) => doc.doctor_id !== doctor_id));
-      } catch (err) {
-        console.error('handleDeleteDoctor error:', err);
+    // show confirmation modal
+    const doc = doctors.find(d => d.doctor_id === doctor_id) || { name: '' }
+    setPendingDeleteDoctor({ doctor_id, name: doc.name })
+  }
+
+  const performDeleteDoctor = async () => {
+    if (!pendingDeleteDoctor) return
+    const { doctor_id } = pendingDeleteDoctor
+    try {
+      const resp = await fetch('/api/doctors', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doctor_id }),
+      })
+      const json = await resp.json()
+      if (!resp.ok) {
+        console.error('Error deleting doctor:', json)
+        setPendingDeleteDoctor(null)
+        return
       }
-    })();
-  };
+      setDoctors((prev) => prev.filter((doc) => doc.doctor_id !== doctor_id))
+    } catch (err) {
+      console.error('performDeleteDoctor error:', err)
+    } finally {
+      setPendingDeleteDoctor(null)
+    }
+  }
 
   const openEditModal = (doctor) => {
     setSelectedDoctor(doctor);
@@ -236,10 +230,6 @@ export default function DoctorsPage() {
     const dayToIdx = { Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 7 };
 
     try {
-      // remove existing schedules for this doctor
-      const { error: delError } = await supabase().from('doctor_schedule').delete().eq('doctor_id', doctorId);
-      if (delError) console.error('Error deleting existing schedules:', delError);
-
       // prepare inserts
       const inserts = [];
       Object.entries(schedule).forEach(([day, times]) => {
@@ -252,24 +242,25 @@ export default function DoctorsPage() {
           doctor_id: doctorId,
           day_of_week: dayToIdx[day] || null,
           start_time: formatTime(start),
-          end_time: formatTime(end)
-        });
-      });
+          end_time: formatTime(end),
+        })
+      })
 
-      if (inserts.length > 0) {
-        const { data: inserted, error: insertError } = await supabase().from('doctor_schedule').insert(inserts);
-        if (insertError) {
-          console.error('Error inserting schedules:', insertError);
-        } else {
-          console.log('Inserted schedules:', inserted);
-        }
+      const resp = await fetch('/api/doctors', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'schedule', doctor_id: doctorId, inserts }),
+      })
+      const json = await resp.json()
+      if (!resp.ok) {
+        console.error('Error saving schedules:', json)
       }
 
       // update local state
-      setDoctors((prev) => prev.map((d) => (d.doctor_id === doctorId ? selectedDoctor : d)));
-      setShowScheduleModal(false);
+      setDoctors((prev) => prev.map((d) => (d.doctor_id === doctorId ? selectedDoctor : d)))
+      setShowScheduleModal(false)
     } catch (err) {
-      console.error('saveSchedule error:', err);
+      console.error('saveSchedule error:', err)
     }
   };
 
@@ -316,6 +307,16 @@ export default function DoctorsPage() {
       {/* Schedule Management Modal */}
       {showScheduleModal && selectedDoctor && (
         <ScheduleManagementModal setShowScheduleModal={setShowScheduleModal} selectedDoctor={selectedDoctor} setSelectedDoctor={setSelectedDoctor} handleScheduleChange={handleScheduleChange} saveSchedule={saveSchedule}></ScheduleManagementModal>
+      )}
+      {pendingDeleteDoctor && (
+        <ConfirmModal
+          title="Supprimer le médecin"
+          message={`Voulez-vous vraiment supprimer "${pendingDeleteDoctor.name}" ? Cette action est irréversible.`}
+          confirmLabel="Supprimer"
+          cancelLabel="Annuler"
+          onConfirm={performDeleteDoctor}
+          onCancel={() => setPendingDeleteDoctor(null)}
+        />
       )}
     </div>
   );
