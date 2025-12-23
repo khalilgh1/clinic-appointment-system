@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase/client';
 import AddServiceModal from '@/components/modals/AddServiceModal'
 import EditServiceModal from '@/components/modals/EditServiceModal'
 import ConfirmModal from '@/components/modals/ConfirmModal'
@@ -41,12 +40,12 @@ export default function ServicesPage() {
         setLoading(true)
         setError(null)
         try {
-            const sb = supabase()
-            const { data, error } = await sb.from('service').select('*').order('service_id', { ascending: false })
-            if (error) throw error
-            setServices(data || [])
+            const resp = await fetch('/api/services')
+            const json = await resp.json()
+            if (!resp.ok) throw json
+            setServices(json.services || [])
         } catch (err) {
-            setError(err.message || String(err))
+            setError(err?.message || JSON.stringify(err) || String(err))
         } finally {
             setLoading(false)
         }
@@ -78,7 +77,6 @@ export default function ServicesPage() {
     }
 
     async function handleAddService() {
-        const sb = supabase()
         const payload = {
             name: formData.name,
             description: formData.description,
@@ -92,13 +90,18 @@ export default function ServicesPage() {
         }
         try {
             setLoading(true)
-            const { error } = await sb.from('service').insert(payload)
-            if (error) throw error
+            const resp = await fetch('/api/services', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: payload }),
+            })
+            const json = await resp.json()
+            if (!resp.ok) throw json
             setShowAddModal(false)
             setFormData({ name: '', description: '', price: 0, duration_min: 0, is_active: true, exams: [], equipments: '', advantages: '', procedures: '' })
             fetchServices()
         } catch (err) {
-            setError(err.message || String(err))
+            setError(err?.message || JSON.stringify(err) || String(err))
         } finally {
             setLoading(false)
         }
@@ -106,7 +109,6 @@ export default function ServicesPage() {
 
     async function handleEditService() {
         if (!selectedService) return
-        const sb = supabase()
         const payload = {
             name: formData.name,
             description: formData.description,
@@ -120,13 +122,18 @@ export default function ServicesPage() {
         }
         try {
             setLoading(true)
-            const { error } = await sb.from('service').update(payload).eq('service_id', selectedService.service_id)
-            if (error) throw error
+            const resp = await fetch('/api/services', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', service_id: selectedService.service_id, updates: payload }),
+            })
+            const json = await resp.json()
+            if (!resp.ok) throw json
             setShowEditModal(false)
             setSelectedService(null)
             fetchServices()
         } catch (err) {
-            setError(err.message || String(err))
+            setError(err?.message || JSON.stringify(err) || String(err))
         } finally {
             setLoading(false)
         }
@@ -143,12 +150,16 @@ export default function ServicesPage() {
         const id = pendingDeleteService.service_id
         try {
             setLoading(true)
-            const sb = supabase()
-            const { error } = await sb.from('service').delete().eq('service_id', id)
-            if (error) throw error
+            const resp = await fetch('/api/services', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ service_id: id }),
+            })
+            const json = await resp.json()
+            if (!resp.ok) throw json
             fetchServices()
         } catch (err) {
-            setError(err.message || String(err))
+            setError(err?.message || JSON.stringify(err) || String(err))
         } finally {
             setLoading(false)
             setPendingDeleteService(null)
