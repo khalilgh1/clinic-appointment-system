@@ -22,6 +22,7 @@ export default function DoctorsPage() {
     name: '',
     specialty_name: '',
     profile_picture: '',
+    profile_file: null,
     description: '',
     email: '',
     is_active: true
@@ -84,6 +85,29 @@ export default function DoctorsPage() {
           email: formData.email || null,
           is_active: Boolean(formData.is_active)
         };
+
+        // upload selected profile file to Supabase storage and set public URL
+        if (formData.profile_file) {
+          try {
+            const file = formData.profile_file;
+            const resp = await fetch('/api/upload-profile', {
+              method: 'POST',
+              headers: {
+                'content-type': file.type || 'application/octet-stream',
+                'x-filename': file.name
+              },
+              body: file
+            })
+            const json = await resp.json()
+            if (resp.ok && json.publicUrl) {
+              toInsert.profile_picture = json.publicUrl
+            } else {
+              console.error('Upload failed:', json)
+            }
+          } catch (err) {
+            console.error('Error uploading image via server route:', err)
+          }
+        }
         const { data: inserted, error: insertError } = await supabase().from('doctor').insert(toInsert).select().single();
         if (insertError) {
           console.error('Error inserting doctor:', insertError);
@@ -91,7 +115,7 @@ export default function DoctorsPage() {
         }
         const newDoctor = { ...inserted, schedule: {}, workDays: '' };
         setDoctors((prev) => [...prev, newDoctor]);
-        setFormData({ name: '', specialty_name: '', profile_picture: '', description: '', email: '', is_active: true });
+        setFormData({ name: '', specialty_name: '', profile_picture: '', profile_file: null, description: '', email: '', is_active: true });
         setShowAddModal(false);
       } catch (err) {
         console.error('handleAddDoctor error:', err);
@@ -110,13 +134,36 @@ export default function DoctorsPage() {
           email: formData.email || null,
           is_active: Boolean(formData.is_active)
         };
+
+        // If a new file was selected, upload and set the new profile URL
+        if (formData.profile_file) {
+          try {
+            const file = formData.profile_file;
+            const resp = await fetch('/api/upload-profile', {
+              method: 'POST',
+              headers: {
+                'content-type': file.type || 'application/octet-stream',
+                'x-filename': file.name
+              },
+              body: file
+            })
+            const json = await resp.json()
+            if (resp.ok && json.publicUrl) {
+              updates.profile_picture = json.publicUrl
+            } else {
+              console.error('Upload failed:', json)
+            }
+          } catch (err) {
+            console.error('Error uploading image via server route:', err)
+          }
+        }
         const { data: updated, error: updateError } = await supabase().from('doctor').update(updates).eq('doctor_id', selectedDoctor.doctor_id).select().single();
         if (updateError) {
           console.error('Error updating doctor:', updateError);
           return;
         }
         setDoctors((prev) => prev.map((doc) => (doc.doctor_id === updated.doctor_id ? { ...doc, ...updated } : doc)));
-        setFormData({ name: '', specialty_name: '', profile_picture: '', description: '', email: '', is_active: true });
+        setFormData({ name: '', specialty_name: '', profile_picture: '', profile_file: null, description: '', email: '', is_active: true });
         setShowEditModal(false);
         setSelectedDoctor(null);
       } catch (err) {
@@ -150,6 +197,7 @@ export default function DoctorsPage() {
       name: doctor.name,
       specialty_name: doctor.specialty_name,
       profile_picture: doctor.profile_picture,
+      profile_file: null,
       description: doctor.description,
       email: doctor.email || '',
       is_active: doctor.is_active ?? true

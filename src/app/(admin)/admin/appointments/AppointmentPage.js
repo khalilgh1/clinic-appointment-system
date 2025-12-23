@@ -231,6 +231,7 @@ export default function AppointmentPage() {
 
     return (
         <div className="p-6">
+            {/* main title */}
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Appointments</h1>
@@ -238,6 +239,8 @@ export default function AppointmentPage() {
                 </div>
             </div>
 
+
+            {/* filter by status cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 mb-8">
                 {statusCards.map((card, index) => {
                     const isActive = statusFilter === card.value
@@ -263,11 +266,14 @@ export default function AppointmentPage() {
                 })}
             </div>
 
+
+
+            {/* advanced filters */}
             <div className="w-full mb-4 h-max">
                 <div className="bg-white border-gray-400 rounded-2xl p-10 shadow-sm h-full">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                            <div className="p-"><Funnel size={20} /></div>
+                            <div className="p-"><Funnel size={20} color="#064045" /></div>
                             <div>
                                 <div className="text-sm font-medium">Filtres avancés</div>
                                 <div className="text-xs text-gray-500">Affinez votre recherche</div>
@@ -330,9 +336,11 @@ export default function AppointmentPage() {
                 </div>
             </div>
 
+
+            {/* appointments table */}
             <div className="overflow-auto bg-white rounded shadow-sm">
                 <table className="min-w-full table-auto">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-primary text-white rounded">
                         <tr>
                             <th className="text-left p-3">#</th>
                             <th className="text-left p-3">Patient</th>
@@ -360,20 +368,20 @@ export default function AppointmentPage() {
                             </tr>
                         ) : (
                             displayed.map((a) => (
-                                <tr key={a.appointment_id} className="border-t border-gray-400">
+                                <tr key={a.appointment_id} className="border-t border-gray-400 ">
                                     <td className="p-3">{a.appointment_id}</td>
-                                    <td className="p-3">
+                                    <td className="p-3 bg-gray-50">
                                         <div className="font-medium">
                                             {a.patient_first_name} {a.patient_last_name}
                                         </div>
                                         <div className="text-sm text-gray-500">{a.patient_email}</div>
                                     </td>
                                     <td className="p-3">{a.patient_phone}</td>
-                                    <td className="p-3">{a.doctor_id ?? "-"}</td>
+                                    <td className="p-3 bg-gray-50">{a.doctor_id ?? "-"}</td>
                                     <td className="p-3">{a.service_id ?? "-"}</td>
-                                    <td className="p-3">{a.start_time ? new Date(a.start_time).toISOString().split("T")[0] : "-"}</td>
+                                    <td className="p-3 bg-gray-50">{a.start_time ? new Date(a.start_time).toISOString().split("T")[0] : "-"}</td>
                                     <td className="p-3">{a.end_time ? new Date(a.end_time).toISOString().split("T")[0] : "-"}</td>
-                                    <td className="p-3">
+                                    <td className="p-3 bg-gray-50">
                                         <select
                                             value={a.status || ""}
                                             onChange={(e) => updateStatus(a.appointment_id, e.target.value)}

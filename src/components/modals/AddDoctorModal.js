@@ -1,4 +1,4 @@
-import { X} from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function AddDoctorModal(props) {
   return (<div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -36,11 +36,22 @@ export default function AddDoctorModal(props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">URL de la profile_picture de profil</label>
-          <input type="text" value={props.formData.profile_picture} onChange={e => props.setFormData({
-            ...props.formData,
-            profile_picture: e.target.value
-          })} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          <label className="block text-sm font-medium text-gray-700 mb-1">Photo de profil</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={e => props.setFormData({
+              ...props.formData,
+              profile_file: e.target.files && e.target.files[0] ? e.target.files[0] : null
+            })}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+          {props.formData.profile_picture && !props.formData.profile_file && (
+            <img src={props.formData.profile_picture} alt="preview" className="mt-2 h-20 w-20 object-cover rounded-full" />
+          )}
+          {props.formData.profile_file && (
+            <p className="text-sm text-gray-500 mt-2">Fichier sélectionné: {props.formData.profile_file.name}</p>
+          )}
         </div>
 
         <div>
