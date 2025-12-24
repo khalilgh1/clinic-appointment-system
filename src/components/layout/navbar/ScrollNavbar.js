@@ -1,3 +1,10 @@
+/**
+ * Scroll Navbar Behavior
+ * 
+ * Manages the scroll-dependent behavior of the navbar.
+ * It handles showing/hiding the navbar based on scroll direction (hide on down, show on up)
+ * and toggles the background transparency when scrolled from the top.
+ */
 'use client';
 
 import React from 'react';

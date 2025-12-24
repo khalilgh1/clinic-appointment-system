@@ -1,4 +1,9 @@
-// components/ui/Doctor/DoctorsSection.js
+/**
+ * Doctors Grid Section
+ * 
+ * Fetches the list of active doctors from the database and renders them in a responsive grid.
+ * It acts as the main container for displaying the medical team.
+ */
 import React from 'react';
 import { createClient } from '@/lib/supabase/server';
 import DoctorCard from './DoctorCard';

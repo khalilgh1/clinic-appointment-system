@@ -1,4 +1,10 @@
-// components/ui/Doctor/DoctorSlider.js
+/**
+ * Doctor Image Slider
+ * 
+ * An auto-scrolling carousel displaying images of the medical team or clinic.
+ * It adds visual dynamism to the hero section with smooth transitions and
+ * navigation controls.
+ */
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';

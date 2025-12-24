@@ -1,4 +1,9 @@
-// components/ui/Doctor/DoctorCard.js
+/**
+ * Doctor Card Component
+ * 
+ * Displays a summary of a doctor's profile, including their image, name, 
+ * specialty, and a brief description. It serves as a single item in the doctors grid.
+ */
 import React from 'react';
 import DoctorImage from './DoctorImage';
 import DoctorName from './DoctorName';
@@ -6,7 +11,6 @@ import DoctorSpecialty from './DoctorSpecialty';
 import DoctorDescriptionCard from './DoctorDescriptionCard';
 
 const DoctorCard = ({ doctor, index }) => {
-  // Alternate between primary (blue) and secondary (yellow) colors
   const colorType = index % 2 === 0 ? 'primary' : 'secondary';
 
   return (

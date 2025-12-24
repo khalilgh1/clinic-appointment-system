@@ -1,4 +1,9 @@
-// components/ui/Doctor/DoctorName.js
+/**
+ * Doctor Name Component
+ * 
+ * Displays the doctor's name with specific typography and styling.
+ * It ensures consistent heading hierarchy within the doctor card.
+ */
 import React from 'react';
 
 const DoctorName = ({ name }) => {

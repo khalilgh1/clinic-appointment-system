@@ -1,3 +1,9 @@
+/**
+ * Footer Logo Section
+ * 
+ * Displays the clinic's logo and a brief mission statement in the footer.
+ * Serves as a visual anchor for the footer section.
+ */
 import Link from 'next/link';
 import Image from 'next/image';
 

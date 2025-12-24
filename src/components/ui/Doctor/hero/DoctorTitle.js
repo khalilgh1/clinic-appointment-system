@@ -1,4 +1,9 @@
-// components/ui/Doctor/DoctorTitle.js
+/**
+ * Doctor Page Title
+ * 
+ * Renders the main heading for the doctors page.
+ * It uses a custom font to create a welcoming and professional aesthetic.
+ */
 import React from 'react';
 
 const DoctorTitle = () => {

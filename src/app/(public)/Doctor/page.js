@@ -1,3 +1,10 @@
+/**
+ * Doctors Page
+ * 
+ * This page displays the list of doctors available in the clinic.
+ * It assembles the hero section, the doctors grid, and a call-to-action section
+ * to guide users towards booking an appointment.
+ */
 // app/doctors/page.js
 import React from 'react';
 import DoctorHeroSection from '@/components/ui/Doctor/hero/DoctorHeroSection';

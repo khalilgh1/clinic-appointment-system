@@ -1,3 +1,10 @@
+/**
+ * Services Dropdown
+ * 
+ * A dynamic dropdown component for displaying available services.
+ * It fetches the list of active services from Supabase and displays them
+ * in a dropdown menu on desktop or a collapsible list on mobile.
+ */
 'use client';
 
 import React from 'react';

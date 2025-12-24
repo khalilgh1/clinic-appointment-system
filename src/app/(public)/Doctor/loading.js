@@ -1,3 +1,9 @@
+/**
+ * Loading State
+ * 
+ * Displays a skeleton animation while the Doctors page content is being fetched.
+ * This improves the user experience by providing immediate visual feedback.
+ */
 export default function Loading() {
     return (
         <div className="space-y-10 px-6 py-10 animate-pulse">

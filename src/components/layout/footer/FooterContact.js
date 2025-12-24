@@ -1,3 +1,9 @@
+/**
+ * Footer Contact Information
+ * 
+ * Displays the clinic's contact details in the footer.
+ * Includes interactive icons for phone, email, and social media links (Facebook, Instagram).
+ */
 import { Mail, Phone, Facebook, Instagram } from 'lucide-react';
 
 export default function FooterContact() {

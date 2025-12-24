@@ -1,3 +1,10 @@
+/**
+ * Main Footer Component
+ * 
+ * Assembles the footer section of the application.
+ * It integrates the logo, quick links, services list, and contact information
+ * into a cohesive layout, along with the copyright notice.
+ */
 "use client";
 import React from 'react';
 import FooterLogo from './FooterLogo';

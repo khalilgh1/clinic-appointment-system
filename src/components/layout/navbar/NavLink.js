@@ -1,3 +1,10 @@
+/**
+ * Navigation Link Component
+ * 
+ * A reusable link component for the navbar.
+ * It handles active state styling and hover effects, dynamically adjusting
+ * text and underline colors based on the current theme and scroll state.
+ */
 'use client';
 
 import Link from 'next/link';

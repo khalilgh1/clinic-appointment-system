@@ -1,9 +1,13 @@
-// components/ui/Doctor/DoctorSpecialty.js
+/**
+ * Doctor Specialty Badge
+ * 
+ * Displays the doctor's medical specialty in a styled badge.
+ * The badge color adapts based on the card's color type (primary/secondary)
+ * to create visual variety in the grid.
+ */
 import React from 'react';
 
 const DoctorSpecialty = ({ specialty, colorType }) => {
-  // When colorType is primary: container is primary, text is yellow (secondary)
-  // When colorType is secondary: container is yellow (secondary), text is blue (primary)
   const bgColor = colorType === 'primary' ? 'bg-primary' : 'bg-secondary';
   const textColor = colorType === 'primary' ? 'text-secondary' : 'text-primary';
 

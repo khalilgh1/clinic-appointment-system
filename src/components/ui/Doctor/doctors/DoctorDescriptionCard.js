@@ -1,4 +1,9 @@
-// components/ui/Doctor/DoctorDescriptionCard.js
+/**
+ * Doctor Description Card
+ * 
+ * Renders a brief description of the doctor within the card.
+ * It limits the text width and applies consistent styling for readability.
+ */
 import React from 'react';
 
 const DoctorDescriptionCard = ({ description }) => {

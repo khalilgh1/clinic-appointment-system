@@ -1,3 +1,10 @@
+/**
+ * Navbar Client Logic
+ * 
+ * Handles the client-side interactivity for the Navbar.
+ * This includes managing the mobile menu toggle state, detecting scroll events
+ * to adjust styling, and rendering the mobile menu overlay using a React Portal.
+ */
 'use client';
 
 import React from 'react';

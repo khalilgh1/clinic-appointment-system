@@ -1,4 +1,10 @@
-// components/ui/Doctor/DoctorHeroSection.js
+/**
+ * Doctor Hero Section
+ * 
+ * The top section of the doctors page.
+ * It combines the page title, an image slider, and a descriptive text area
+ * to introduce the medical team to the user.
+ */
 import React from 'react';
 import DoctorTitle from './DoctorTitle';
 import DoctorSlider from './DoctorSlider';

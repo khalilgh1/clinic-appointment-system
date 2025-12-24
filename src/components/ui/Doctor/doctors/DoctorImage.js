@@ -1,4 +1,10 @@
-// components/ui/Doctor/DoctorImage.js
+/**
+ * Doctor Image Component
+ * 
+ * Displays the doctor's profile picture with a decorative circular border.
+ * It handles image loading errors by falling back to a default placeholder
+ * to ensure a consistent UI even if an image is missing.
+ */
 import React from 'react';
 import Image from 'next/image';
 import fs from 'fs';
@@ -24,21 +30,9 @@ const DoctorImage = ({ imageUrl, name, colorType }) => {
     validImageUrl = '/logo.png';
   }
 
-  // Both circles use very light gray color
-  
-  
-  
-  // continue...
-  
-  
-  
-  
-  
-  // Both circles use very light gray color
   const outerBorderColor = 'border-gray-200';
   const innerBorderColor = 'border-white';
   
-  // Top dot is always yellow (secondary), bottom dot is always primary
   const topDotColor = 'bg-secondary';
   const bottomDotColor = 'bg-primary';
 
@@ -49,7 +43,7 @@ const DoctorImage = ({ imageUrl, name, colorType }) => {
         className={`absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 ${topDotColor} rounded-full z-30`}
       />
       
-      {/* Outer circle border - larger size */}
+      {/* Outer circle border */}
       <div className={`relative w-72 h-72 rounded-full border-[3px] ${outerBorderColor} bg-transparent p-2 flex items-center justify-center`}>
         {/* Inner circle with image */}
         <div className={`relative w-full h-full rounded-full border-[3px] ${innerBorderColor} bg-gray-50 overflow-hidden shadow-md`}>

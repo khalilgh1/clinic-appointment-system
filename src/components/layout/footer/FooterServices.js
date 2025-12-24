@@ -1,3 +1,9 @@
+/**
+ * Footer Services List
+ * 
+ * Fetches and displays a list of available services in the footer.
+ * It retrieves up to 6 active services from the database to show as quick links.
+ */
 'use client';
 
 import React from 'react';

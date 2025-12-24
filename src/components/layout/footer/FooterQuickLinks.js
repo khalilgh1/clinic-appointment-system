@@ -1,3 +1,9 @@
+/**
+ * Footer Quick Links
+ * 
+ * Renders a list of essential navigation links in the footer.
+ * Provides users with easy access to the Home, About, Doctors, and Services pages.
+ */
 import Link from 'next/link';
 
 export default function FooterQuickLinks() {

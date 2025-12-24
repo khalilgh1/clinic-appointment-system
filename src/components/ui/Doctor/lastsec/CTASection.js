@@ -1,4 +1,9 @@
-// components/ui/Doctor/lastsec/CTASection.js
+/**
+ * Call to Action Section
+ * 
+ * A prominent section at the bottom of the page encouraging users to take action.
+ * It provides links to book an appointment or learn more about the clinic.
+ */
 import React from 'react';
 import Link from 'next/link';
 

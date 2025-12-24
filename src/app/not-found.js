@@ -1,3 +1,9 @@
+/**
+ * 404 Not Found Page
+ * 
+ * Custom error page displayed when a user visits a non-existent route.
+ * It features a friendly illustration and a button to guide the user back to the homepage.
+ */
 "use client";
 import React from 'react';
 import Image from 'next/image';
