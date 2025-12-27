@@ -164,28 +164,27 @@ const Step2Doctor = ({ onNext, onBack }) => {
         </div>
       )}
 
-      
-        <div className="mt-8 flex justify-between">
-          <button
-            onClick={onBack}
-            className="bg-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
-          >
-            ← Retour
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={!state.selectedDoctor}
-            className={`font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
-              state.selectedDoctor 
-                ? 'bg-secondary text-primary hover:bg-secondary/90' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            ÉTAPE SUIVANTE
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
+      <div className="mt-8 flex justify-between">
+        <button
+          onClick={onBack}
+          className="bg-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors flex items-center gap-2"
+        >
+          ← Retour
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={!state.selectedDoctor}
+          className={`font-semibold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${
+            state.selectedDoctor 
+              ? 'bg-secondary text-primary hover:bg-secondary/90' 
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          ÉTAPE SUIVANTE
+          <ArrowRight className="w-5 h-5" />
+        </button>
       </div>
+    </div>
   );
 };
 
