@@ -34,3 +34,50 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Last Sprint Contribution - Medical Booking System
+
+## Contributor
+
+BELAMRI Chakib
+
+## Files Worked On
+
+### UI Components
+
+- **Booking Flow Steps**: `Step1Service.js`, `Step2Doctor.js`, `Step3Schedule.js`, `Step4Info.js`, `Finalization.js`
+- **UI Cards**: `ServiceCard.js`, `DoctorCard.js`, `doctor_card.js`
+- **Layout**: `Sidebar.js`, `page.js`
+
+### State Management
+
+- **Context**: `BookingContext.js` - Global state for booking flow
+
+### Backend Integration
+
+- **Data Hooks**: `useServices.js`, `useDoctors.js`, `useDoctorsAvailability.js`
+
+## Key Contributions
+
+### UI Layer
+
+- Responsive and User-friendly pages
+
+### State Management
+
+- Implemented booking context with reducer pattern
+- Managed step navigation and form state persistence
+- Handled form validation with XSS protection
+
+### Backend Integration
+
+- Created reusable hooks for data fetching
+- Implemented proper error handling for API failures
+- Prepared components for server-side rendering compatibility
+
+## Production Ready
+
+- All components pass TypeScript compilation
+- No development code in production build
+- Comprehensive testing scenarios provided
+- Ready for `npm run build` and deployment
