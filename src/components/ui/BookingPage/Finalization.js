@@ -6,6 +6,10 @@ import { CheckCircle, XCircle, Home } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
 import { supabase as createSupabaseClient } from '@/lib/supabase/client';
 
+/**
+ * Finalization - Final step in booking flow, submits appointment to database
+ * Handles appointment creation, slot validation, and confirmation email
+ */
 const Finalization = () => { 
   const { state, dispatch } = useBooking();
   const router = useRouter();
@@ -13,7 +17,10 @@ const Finalization = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  // Step 6: Submit appointment to database
+  /**
+   * Submits appointment to database and sends confirmation email
+   * Validates data, checks slot availability, creates appointment record
+   */
   useEffect(() => {
     if (hasSubmitted) return;
 
@@ -22,14 +29,14 @@ const Finalization = () => {
         setStatus('loading');
         setHasSubmitted(true);
 
-        // Validate required data
+        // Validate required booking data
         if (!state.selectedService || !state.selectedDoctor || !state.selectedDateTime || !state.patientInfo) {
           throw new Error('Données de réservation incomplètes');
         }
 
         const supabase = createSupabaseClient();
 
-        // Get service duration
+        // Get service duration for appointment end time calculation
         const { data: service, error: serviceError } = await supabase
           .from('service')
           .select('duration_min')
@@ -50,13 +57,12 @@ const Finalization = () => {
         const startTime = new Date(selectedDate);
         startTime.setHours(hours, minutes, 0, 0);
         
-        // Calculate end_time
+        // Calculate end_time based on service duration
         const endTime = new Date(startTime);
         endTime.setMinutes(endTime.getMinutes() + durationMin);
 
-        // Step 6: Check slot availability again before insertion
-        // Check for overlapping appointments: start_time < new_end_time AND end_time > new_start_time
-        // Only check pending or confirmed appointments (exclude cancelled)
+        // Check for overlapping appointments before insertion
+        // Query: start_time < new_end_time AND end_time > new_start_time
         const { data: conflictingAppointments, error: checkError } = await supabase
           .from('appointment')
           .select('appointment_id, status')
@@ -70,7 +76,6 @@ const Finalization = () => {
         }
 
         if (conflictingAppointments && conflictingAppointments.length > 0) {
-          console.log('Conflicting appointments found:', conflictingAppointments);
           throw new Error('Ce créneau n\'est plus disponible. Veuillez choisir un autre horaire.');
         }
 
@@ -98,36 +103,31 @@ const Finalization = () => {
         // Appointment created successfully
         setStatus('success');
 
-console.log("Envoi de l'email de confirmation à", state.patientInfo.email);
+        // Send confirmation email
+        try {
+          const response = await fetch("/api/send-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: state.patientInfo.email,
+              firstName: state.patientInfo.prenom,
+              doctorName: state.selectedDoctor.name,
+              date: selectedDate,
+              time: state.selectedDateTime.time,
+            }),
+          });
 
-try {
-  const response = await fetch("/api/send-email", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: state.patientInfo.email,
-      firstName: state.patientInfo.prenom,
-      doctorName: state.selectedDoctor.name,
-      date: selectedDate,
-      time: state.selectedDateTime.time,
-    }),
-  });
+          const data = await response.json();
 
-  const data = await response.json();
-  console.log("Send Email Response:", data);
-
-  if (!response.ok) {
-    throw new Error(data.error || "Impossible d'envoyer l'email");
-  }
-
-  // Optional: show the preview URL in success state
-  console.log("Preview URL (Ethereal):", data.previewUrl);
-} catch (err) {
-  console.error("Email sending failed:", err);
-  setStatus("error");
-  setErrorMessage(`Impossible d'envoyer l'email: ${err.message}`);
-  return;
-}
+          if (!response.ok) {
+            throw new Error(data.error || "Impossible d'envoyer l'email");
+          }
+        } catch (err) {
+          console.error("Email sending failed:", err);
+          setStatus("error");
+          setErrorMessage(`Impossible d'envoyer l'email: ${err.message}`);
+          return;
+        }
 
         // Reset booking state after successful submission
         setTimeout(() => {
@@ -137,7 +137,6 @@ try {
       } catch (error) {
         setStatus('error');
         setErrorMessage(error.message || 'Une erreur inattendue est survenue. Veuillez contacter le support.');
-        console.error('Erreur lors de la réservation:', error);
         setHasSubmitted(false);
       }
     };
@@ -145,16 +144,17 @@ try {
     submitAppointment();
   }, [hasSubmitted]);
 
-  // Handle return to home - 
+  /**
+   * Returns to home page and resets booking state
+   */
   const handleReturnHome = () => {
-    // Reset the booking context state
     dispatch({ type: 'RESET_BOOKING' });
-    
-    // Redirect to home page
     router.push('/');
   };
 
-  // Animation de succès
+  /**
+   * Success animation component
+   */
   const SuccessAnimation = () => (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="relative">
@@ -179,6 +179,9 @@ try {
     </div>
   );
 
+  /**
+   * Error animation component
+   */
   const ErrorAnimation = () => (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-6">
@@ -200,6 +203,9 @@ try {
     </div>
   );
 
+  /**
+   * Loading animation component
+   */
   const LoadingAnimation = () => (
     <div className="flex flex-col items-center justify-center py-16">
       <div className="relative mb-6">

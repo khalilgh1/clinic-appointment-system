@@ -3,7 +3,13 @@
 import React from "react";
 import { Check, ArrowRight } from 'lucide-react';
 
-// StepIndicator Component
+/**
+ * StepIndicator - Visual progress indicator for booking steps
+ * Shows completed, current, and upcoming steps
+ * @param {Object} props - Component props
+ * @param {string[]} props.steps - Array of step names
+ * @param {number} props.currentStep - Current step number (1-indexed)
+ */
 const StepIndicator = ({ steps, currentStep }) => {
   return (
     <div className="space-y-4">
@@ -54,22 +60,27 @@ const StepIndicator = ({ steps, currentStep }) => {
   );
 };
 
-// Sidebar Component
+/**
+ * Sidebar - Booking process sidebar with step indicator and contact info
+ * Provides visual progress tracking and support contact information
+ * @param {Object} props - Component props
+ * @param {number} props.currentStep - Current step in booking process
+ * @param {string} props.contactPhone - Contact phone number for support
+ */
 const Sidebar = ({ currentStep, contactPhone }) => {
   const steps = ['Service', 'Médecin', 'Date & Heure', 'Informations'];
   
   return (
     <div className="bg-primary text-white h-full flex flex-col md:min-h-screen md:w-64 w-full overflow-hidden">
       <div className="p-6 flex-1">
-        
-        {/* step indicator */}
+        {/* Step indicator section */}
         <div className="flex-1">
           <h2 className="text-lg font-semibold mb-6">Votre réservation</h2>
           <StepIndicator steps={steps} currentStep={currentStep} />
         </div>
       </div>
       
-      {/* Contact  */}
+      {/* Contact information footer */}
       <div className="p-6 border-t border-gray-600 mt-auto">
         <p className="text-sm text-gray-300 mb-3">Besoin d'aide ?</p>
         <p className="text-lg font-semibold mb-1">{contactPhone}</p>

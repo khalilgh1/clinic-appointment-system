@@ -1,10 +1,14 @@
-// components/ui/ServiceCard.js
 "use client";
 
 import React from 'react';
 import { Heart, Users, Activity, Microscope, Phone } from 'lucide-react';
 
-// ServiceIcon Component
+/**
+ * ServiceIcon - Displays service icon from name or URL
+ * @param {Object} props - Component props
+ * @param {string} props.iconName - Icon name or URL
+ * @param {string} props.className - CSS classes
+ */
 const ServiceIcon = ({ iconName, className }) => {
   const icons = {
     heart: Heart,
@@ -24,7 +28,7 @@ const ServiceIcon = ({ iconName, className }) => {
         alt="Service Icon" 
         className={`${className} object-contain`} 
         onError={(e) => {
-          e.target.style.display = 'none'; // Hide if fails to load
+          e.target.style.display = 'none';
         }}
       />
     );
@@ -34,18 +38,20 @@ const ServiceIcon = ({ iconName, className }) => {
   return <Icon className={className} />;
 };
 
-// ServiceCard Component with detailed logging
+/**
+ * ServiceCard - Displays service information for selection in booking flow
+ * Shows service details with visual selection feedback
+ * @param {Object} props - Component props
+ * @param {Object} props.service - Service data
+ * @param {boolean} props.isSelected - Selection state
+ * @param {Function} props.onSelect - Selection handler
+ */
 const ServiceCard = ({ service, isSelected, onSelect }) => {
-  console.log(`🎯 ServiceCard ${service.id} - isSelected:`, isSelected, 'Service:', service.name);
-  
   return (
     <div 
       className={`bg-white rounded-lg p-4 md:p-6 shadow-sm transition-all cursor-pointer h-full flex flex-col 
       ${isSelected ? 'border-2 border-primary shadow-lg' : 'border border-gray-200 hover:border-primary/40 hover:shadow-md'}`}
-      onClick={() => {
-        console.log('🖱️ Click on ServiceCard:', service.id);
-        onSelect(service);
-      }}
+      onClick={() => onSelect(service)}
     >
       <div className="flex items-start gap-3 md:gap-4">
         <div className="rounded-lg p-2 md:p-3 flex-shrink-0 bg-secondary">
@@ -55,7 +61,6 @@ const ServiceCard = ({ service, isSelected, onSelect }) => {
         <div className="flex-1 min-w-0">
           <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-1 md:mb-2">
             {service.name}
-            {/* {isSelected && <span className="ml-2 text-xs text-primary">✅ SELECTED</span>} */}
           </h3>
           <p className="text-xs md:text-sm text-gray-600 leading-relaxed mb-3 md:mb-4">
             {service.description}

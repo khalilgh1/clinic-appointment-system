@@ -6,23 +6,27 @@ import { useDoctors } from '@/hooks/useDoctors';
 import { useBooking } from '@/context/BookingContext';
 import DoctorCard from '../DoctorCard';
 
+/**
+ * Step2Doctor - Second step in booking flow: doctor selection
+ * Displays doctors filtered by selected service with responsive carousel
+ */
 const Step2Doctor = ({ onNext, onBack }) => {
   const { state, dispatch } = useBooking();
   const { doctors, loading, error } = useDoctors(state.selectedService?.id);
   
   const [currentPage, setCurrentPage] = useState(0);
-  const [cardsPerPage, setCardsPerPage] = useState(4); // Default: 4 cards visible (2x2)
+  const [cardsPerPage, setCardsPerPage] = useState(4);
   const carouselRef = useRef(null);
 
   // Adjust cards per page based on screen size
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setCardsPerPage(1); // Mobile: 1 card
+        setCardsPerPage(1);
       } else if (window.innerWidth < 1024) {
-        setCardsPerPage(2); // Tablet: 2 cards (1x2)
+        setCardsPerPage(2);
       } else {
-        setCardsPerPage(4); // Desktop: 4 cards (2x2)
+        setCardsPerPage(4);
       }
     };
 
@@ -31,10 +35,18 @@ const Step2Doctor = ({ onNext, onBack }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  /**
+   * Handles doctor selection and updates booking context
+   * @param {Object} doctor - Selected doctor object
+   */
   const handleSelectDoctor = (doctor) => {
     dispatch({ type: 'SET_DOCTOR', payload: doctor });
   };
 
+  /**
+   * Validates selection and proceeds to next step
+   * @param {Event} e - Form event
+   */
   const handleNext = (e) => {
     e.preventDefault();
     if (state.selectedDoctor) {
@@ -56,12 +68,12 @@ const Step2Doctor = ({ onNext, onBack }) => {
   const canGoNext = currentPage < totalPages - 1;
   const showCarousel = doctors.length > cardsPerPage;
 
-  // Get current page doctors
+  // Get current page doctors for carousel display
   const startIndex = currentPage * cardsPerPage;
   const endIndex = startIndex + cardsPerPage;
   const currentDoctors = doctors.slice(startIndex, endIndex);
 
-  // Gestion des états de chargement et d'erreur
+  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -70,6 +82,7 @@ const Step2Doctor = ({ onNext, onBack }) => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="flex justify-center items-center py-12 flex-col">
@@ -90,13 +103,14 @@ const Step2Doctor = ({ onNext, onBack }) => {
         Sélectionnez votre médecin
       </h1>
 
+      {/* No doctors available for selected service */}
       {doctors.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           Aucun médecin disponible pour ce service
         </div>
       ) : (
         <div className="relative px-20">
-          {/* Carousel Container - 2x2 Grid */}
+          {/* Carousel Container - Responsive grid */}
           <div className="overflow-hidden" ref={carouselRef}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {currentDoctors.map((doctor) => (
@@ -149,7 +163,7 @@ const Step2Doctor = ({ onNext, onBack }) => {
         </div>
       )}
 
-      {/* Carousel Indicators (optional dots) */}
+      {/* Carousel Indicators */}
       {showCarousel && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }).map((_, idx) => (
@@ -164,6 +178,7 @@ const Step2Doctor = ({ onNext, onBack }) => {
         </div>
       )}
 
+      {/* Navigation Buttons */}
       <div className="mt-8 flex justify-between">
         <button
           onClick={onBack}

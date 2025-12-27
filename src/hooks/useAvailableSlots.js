@@ -36,7 +36,7 @@ export const useAvailableSlots = (doctorId, serviceId, selectedDate) => {
           .single();
 
         if (serviceError || !service) {
-          throw new Error(`Erreur lors de la récupération du service: ${serviceError?.message || 'Service introuvable'}`);
+          throw new Error(`Erreur lors de la récupération du service: ${serviceError?.message || 'Service introuvable'}, veuillez vérifier votre connexion`);
         }
 
         const durationMin = service.duration_min || 30; // Default to 30 minutes
@@ -70,7 +70,7 @@ export const useAvailableSlots = (doctorId, serviceId, selectedDate) => {
 
         if (exceptionError && exceptionError.code !== 'PGRST116') {
           // PGRST116 = no rows returned, which is fine
-          throw new Error(`Erreur lors de la récupération de l'exception: ${exceptionError.message}`);
+          throw new Error(`Erreur lors de la récupération de l'exception: ${exceptionError.message}, veuillez vérifier votre connexion`);
         }
 
         // Determine working hours for this day
@@ -104,7 +104,7 @@ export const useAvailableSlots = (doctorId, serviceId, selectedDate) => {
           .lte('start_time', endOfDay.toISOString());
 
         if (appointmentError) {
-          throw new Error(`Erreur lors de la récupération des rendez-vous: ${appointmentError.message}`);
+          throw new Error(`Erreur lors de la récupération des rendez-vous: ${appointmentError.message}, veuillez vérifier votre connexion`);
         }
 
         // Parse time strings (format: "HH:MM:SS" or "HH:MM")

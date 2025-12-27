@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft, User, Mail, Phone, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
 
+/**
+ * Step4Info - Fourth step in booking flow: patient information collection
+ * Collects and validates patient details with security sanitization
+ */
 const Step4Info = ({ onNext, onBack }) => {
   const { state, dispatch } = useBooking();
   const [formData, setFormData] = useState({
@@ -23,7 +27,7 @@ const Step4Info = ({ onNext, onBack }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Validation patterns
+  // Validation patterns for form fields
   const patterns = {
     nom: /^[a-zA-ZÀ-ÿ\s'-]{2,50}$/,
     prenom: /^[a-zA-ZÀ-ÿ\s'-]{2,50}$/,
@@ -32,7 +36,11 @@ const Step4Info = ({ onNext, onBack }) => {
     notes: /^[^<>]{0,500}$/
   };
 
-  // Sanitize input to prevent XSS
+  /**
+   * Sanitizes input to prevent XSS attacks
+   * @param {string} input - Raw input string
+   * @returns {string} Sanitized input
+   */
   const sanitizeInput = (input) => {
     if (typeof input !== 'string') return input;
     
@@ -48,7 +56,12 @@ const Step4Info = ({ onNext, onBack }) => {
     return sanitized.trim();
   };
 
-  // Validate individual field
+  /**
+   * Validates individual form field
+   * @param {string} name - Field name
+   * @param {string} value - Field value
+   * @returns {string} Error message or empty string
+   */
   const validateField = (name, value) => {
     let error = '';
 
@@ -133,7 +146,10 @@ const Step4Info = ({ onNext, onBack }) => {
     return error;
   };
 
-  // Handle input change with validation
+  /**
+   * Handles input changes with sanitization and validation
+   * @param {Event} e - Input change event
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -156,7 +172,10 @@ const Step4Info = ({ onNext, onBack }) => {
     }
   };
 
-  // Handle blur event
+  /**
+   * Handles blur event for field validation
+   * @param {Event} e - Blur event
+   */
   const handleBlur = (e) => {
     const { name, value } = e.target;
     
@@ -174,7 +193,10 @@ const Step4Info = ({ onNext, onBack }) => {
     }));
   };
 
-  // Validate all fields
+  /**
+   * Validates entire form
+   * @returns {boolean} True if form is valid
+   */
   const validateForm = () => {
     const newErrors = {};
     const requiredFields = ['civilite', 'nom', 'prenom', 'email', 'telephone', 'dateNaissance'];
@@ -198,10 +220,14 @@ const Step4Info = ({ onNext, onBack }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Handles form submission with validation
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Mark all fields as touched
+    // Mark all fields as touched for validation display
     const allTouched = {};
     Object.keys(formData).forEach(key => {
       allTouched[key] = true;
@@ -233,7 +259,7 @@ const Step4Info = ({ onNext, onBack }) => {
       return acc;
     }, {});
 
-    // Store patient info in context
+    // Store patient info in booking context
     dispatch({ 
       type: 'SET_PATIENT_INFO', 
       payload: sanitizedData 
@@ -242,7 +268,11 @@ const Step4Info = ({ onNext, onBack }) => {
     onNext();
   };
 
-  // Helper function to get input classes
+  /**
+   * Generates CSS classes for input fields based on validation state
+   * @param {string} fieldName - Field name
+   * @returns {string} Tailwind CSS classes
+   */
   const getInputClasses = (fieldName) => {
     const baseClasses = "w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors";
     if (errors[fieldName] && touched[fieldName]) {
@@ -260,7 +290,7 @@ const Step4Info = ({ onNext, onBack }) => {
         Veuillez remplir vos informations pour finaliser la réservation
       </p>
 
-      {/* Récapitulatif de la réservation */}
+      {/* Booking Summary */}
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 mb-8">
         <h2 className="text-lg font-semibold text-primary mb-4">Récapitulatif de votre rendez-vous</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -292,11 +322,11 @@ const Step4Info = ({ onNext, onBack }) => {
         </div>
       </div>
 
-      {/* Formulaire */}
+      {/* Information Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* Civilité */}
+          {/* Civility Selection */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Civilité <span className="text-red-500">*</span>
@@ -336,7 +366,7 @@ const Step4Info = ({ onNext, onBack }) => {
             )}
           </div>
 
-          {/* Nom */}
+          {/* Last Name */}
           <div>
             <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-2">
               Nom <span className="text-red-500">*</span>
@@ -364,7 +394,7 @@ const Step4Info = ({ onNext, onBack }) => {
             )}
           </div>
 
-          {/* Prénom */}
+          {/* First Name */}
           <div>
             <label htmlFor="prenom" className="block text-sm font-medium text-gray-700 mb-2">
               Prénom <span className="text-red-500">*</span>
@@ -420,7 +450,7 @@ const Step4Info = ({ onNext, onBack }) => {
             )}
           </div>
 
-          {/* Téléphone */}
+          {/* Phone */}
           <div>
             <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-2">
               Téléphone <span className="text-red-500">*</span>
@@ -448,7 +478,7 @@ const Step4Info = ({ onNext, onBack }) => {
             )}
           </div>
 
-          {/* Date de naissance */}
+          {/* Birth Date */}
           <div className="md:col-span-2">
             <label htmlFor="dateNaissance" className="block text-sm font-medium text-gray-700 mb-2">
               Date de naissance <span className="text-red-500">*</span>
@@ -476,7 +506,7 @@ const Step4Info = ({ onNext, onBack }) => {
             )}
           </div>
 
-          {/* Notes médicales */}
+          {/* Medical Notes */}
           <div className="md:col-span-2">
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
               Informations médicales importantes (optionnel)
@@ -509,7 +539,7 @@ const Step4Info = ({ onNext, onBack }) => {
 
         </div>
 
-        {/* Navigation */}
+        {/* Navigation Buttons */}
         <div className="mt-8 flex justify-between pt-6 border-t border-gray-200">
           <button
             type="button"

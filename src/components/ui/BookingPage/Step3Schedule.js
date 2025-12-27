@@ -6,27 +6,34 @@ import { useBooking } from '@/context/BookingContext';
 import { useAvailableDates } from '@/hooks/useAvailableDates';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
 
+/**
+ * Step3Schedule - Third step in booking flow: date and time selection
+ * Displays interactive calendar and available time slots for selected doctor
+ */
 const Step3Schedule = ({ onNext, onBack }) => {
   const { state, dispatch } = useBooking();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Step 3: Generate available days using hooks
+  // Fetch available dates for the selected doctor (3 months ahead)
   const { availableDates, loading: datesLoading, error: datesError } = useAvailableDates(
     state.selectedDoctor?.id,
-    3 // 3 months ahead
+    3
   );
 
-  // Step 4: Generate available slots for selected day
+  // Fetch available time slots for selected date
   const { availableSlots, loading: slotsLoading, error: slotsError } = useAvailableSlots(
     state.selectedDoctor?.id,
     state.selectedService?.id,
     selectedDate
   );
 
+  /**
+   * Handles date selection with availability validation
+   * @param {Date} date - Selected date
+   */
   const handleDateSelect = (date) => {
-    // Only allow selection if date is available
     const isAvailable = availableDates.some(availableDate => 
       availableDate.toDateString() === date.toDateString()
     );
@@ -36,14 +43,21 @@ const Step3Schedule = ({ onNext, onBack }) => {
     }
   };
 
+  /**
+   * Handles time slot selection
+   * @param {string} time - Selected time string (HH:MM format)
+   */
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
   };
 
+  /**
+   * Stores selected date/time and proceeds to next step
+   * @param {Event} e - Form event
+   */
   const handleNext = (e) => {
     e.preventDefault();
     if (selectedDate && selectedTime) {
-      // Store the date and hour !
       dispatch({ 
         type: 'SET_DATE_TIME', 
         payload: {
@@ -55,15 +69,21 @@ const Step3Schedule = ({ onNext, onBack }) => {
     }
   };
 
-  // Navigation in calendar
+  /**
+   * Navigates to next month in calendar
+   */
   const nextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
+  /**
+   * Navigates to previous month in calendar
+   */
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
 
+  // Error handling for dates loading
   if (datesError) {
     return (
       <div className="flex justify-center items-center py-12 flex-col">
@@ -84,6 +104,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
         Choisissez la date et l'heure
       </h1>
 
+      {/* Loading state for dates */}
       {datesLoading && (
         <div className="flex justify-center items-center py-8">
           <div className="text-gray-500">Chargement des dates disponibles...</div>
@@ -92,7 +113,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Section Calendrier */}
+        {/* Calendar Section */}
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
@@ -125,7 +146,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
           )}
         </div>
 
-        {/* Section hours */}
+        {/* Time Slots Section */}
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-primary mb-6 flex items-center gap-2">
             <Clock className="w-5 h-5" />
@@ -172,7 +193,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
         </div>
       </div>
 
-      {/* what is selected ? */}
+      {/* Selection Summary */}
       {(selectedDate || selectedTime) && (
         <div className="mt-6 bg-primary/5 border border-primary/20 rounded-lg p-4">
           <h3 className="font-semibold text-primary mb-2">Récapitulatif</h3>
@@ -200,7 +221,7 @@ const Step3Schedule = ({ onNext, onBack }) => {
         </div>
       )}
 
-      {/* Navigation */}
+      {/* Navigation Buttons */}
       <div className="mt-8 flex justify-between">
         <button
           onClick={onBack}
@@ -226,23 +247,30 @@ const Step3Schedule = ({ onNext, onBack }) => {
   );
 };
 
-// Componant calendar
+/**
+ * CalendarGrid - Displays calendar month with selectable available dates
+ * @param {Object} props - Component props
+ * @param {Date} props.currentMonth - Current displayed month
+ * @param {Date[]} props.availableDates - Array of available dates
+ * @param {Date} props.selectedDate - Currently selected date
+ * @param {Function} props.onDateSelect - Date selection handler
+ */
 const CalendarGrid = ({ currentMonth, availableDates, selectedDate, onDateSelect }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Generate days for the month
+  // Generate days for the month with availability status
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
   const firstDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const days = [];
   
-  // empty days before month start
+  // Empty days before month start
   for (let i = 0; i < firstDayIndex; i++) {
     days.push(null);
   }
   
-  // month days
+  // Month days with status
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
     date.setHours(0, 0, 0, 0);
@@ -309,7 +337,13 @@ const CalendarGrid = ({ currentMonth, availableDates, selectedDate, onDateSelect
   );
 };
 
-// hours grid component
+/**
+ * TimeSlotsGrid - Displays available time slots for selection
+ * @param {Object} props - Component props
+ * @param {string[]} props.availableTimes - Array of available time strings
+ * @param {string} props.selectedTime - Currently selected time
+ * @param {Function} props.onTimeSelect - Time selection handler
+ */
 const TimeSlotsGrid = ({ availableTimes, selectedTime, onTimeSelect }) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -329,6 +363,5 @@ const TimeSlotsGrid = ({ availableTimes, selectedTime, onTimeSelect }) => {
     </div>
   );
 };
-
 
 export default Step3Schedule;

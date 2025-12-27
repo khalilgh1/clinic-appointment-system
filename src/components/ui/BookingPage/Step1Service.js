@@ -6,23 +6,27 @@ import { useBooking } from '@/context/BookingContext';
 import { useServices } from '@/hooks/useServices';
 import ServiceCard from '../ServiceCard';
 
+/**
+ * Step1Service - First step in booking flow: service selection
+ * Displays available services in responsive carousel with pagination
+ */
 const Step1Service = ({ onNext }) => {
   const { state, dispatch } = useBooking();
   const { services, loading, error, usingFallback } = useServices();
   
   const [currentPage, setCurrentPage] = useState(0);
-  const [cardsPerPage, setCardsPerPage] = useState(4); // Default: 4 cards visible (2x2)
+  const [cardsPerPage, setCardsPerPage] = useState(4);
   const carouselRef = useRef(null);
 
   // Adjust cards per page based on screen size
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setCardsPerPage(1); // Mobile: 1 card
+        setCardsPerPage(1);
       } else if (window.innerWidth < 1024) {
-        setCardsPerPage(2); // Tablet: 2 cards (1x2)
+        setCardsPerPage(2);
       } else {
-        setCardsPerPage(4); // Desktop: 4 cards (2x2)
+        setCardsPerPage(4);
       }
     };
 
@@ -31,21 +35,21 @@ const Step1Service = ({ onNext }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  /**
+   * Handles service selection and updates booking context
+   * @param {Object} service - Selected service object
+   */
   const handleSelectService = (service) => {
-    console.log('📌 BEFORE Dispatch - Current selected:', state.selectedService?.id);
-    console.log('📌 Dispatching SET_SERVICE for:', service.id, service.name);
-    
     dispatch({ type: 'SET_SERVICE', payload: service });
-    
-    setTimeout(() => {
-      console.log('📈 AFTER Dispatch (timeout) - selected service:', state.selectedService?.id);
-    }, 100);
   };
 
+  /**
+   * Validates selection and proceeds to next step
+   * @param {Event} e - Form event
+   */
   const handleNext = (e) => {
     e.preventDefault();
     if (state.selectedService) {
-      console.log('➡️ Moving to next step with service:', state.selectedService.name);
       onNext();
     }
   };
@@ -64,11 +68,12 @@ const Step1Service = ({ onNext }) => {
   const canGoNext = currentPage < totalPages - 1;
   const showCarousel = services.length > cardsPerPage;
 
-  // Get current page services
+  // Get current page services for carousel display
   const startIndex = currentPage * cardsPerPage;
   const endIndex = startIndex + cardsPerPage;
   const currentServices = services.slice(startIndex, endIndex);
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -77,7 +82,8 @@ const Step1Service = ({ onNext }) => {
     );
   }
 
-  if (error && !usingFallback) {
+  // Error state - NO MORE FALLBACK MODE
+  if (error) {
     return (
       <div className="flex justify-center items-center py-12 flex-col">
         <div className="text-red-500 text-center mb-4">{error}</div>
@@ -97,21 +103,14 @@ const Step1Service = ({ onNext }) => {
         Sélectionnez un service
       </h1>
 
-      {usingFallback && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <p className="text-yellow-800 text-sm">
-            ⚠️ Mode démonstration - Données de test utilisées
-          </p>
-        </div>
-      )}
-
+      {/* Services list or empty state */}
       {services.length === 0 && !loading ? (
         <div className="text-center py-12 text-gray-500">
           Aucun service disponible pour le moment
         </div>
       ) : (
         <div className="relative px-20">
-          {/* Carousel Container - 2x2 Grid */}
+          {/* Carousel Container - Responsive grid */}
           <div className="overflow-hidden" ref={carouselRef}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-11">
               {currentServices.map(service => {
@@ -168,7 +167,7 @@ const Step1Service = ({ onNext }) => {
         </div>
       )}
 
-      {/* Carousel Indicators (optional dots) */}
+      {/* Carousel Indicators */}
       {showCarousel && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }).map((_, idx) => (
@@ -183,6 +182,7 @@ const Step1Service = ({ onNext }) => {
         </div>
       )}
 
+      {/* Next Step Button */}
       <div className="mt-8 flex justify-center">
         <button
           onClick={handleNext}
