@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import { supabase as createSupabaseClient } from '../lib/supabase/client';
 
+/**
+ * Custom hook to fetch doctors based on selected service
+ * Queries doctor_services junction table and filters active doctors
+ * @param {number|null} serviceId - ID of selected service
+ * @returns {Object} Doctors data with loading and error states
+ */
 export const useDoctors = (serviceId = null) => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +20,7 @@ export const useDoctors = (serviceId = null) => {
         setLoading(true);
         setError(null);
 
+        // Return empty array if no service selected
         if (!serviceId) {
           setDoctors([]);
           setLoading(false);
@@ -22,27 +29,27 @@ export const useDoctors = (serviceId = null) => {
 
         const supabase = createSupabaseClient();
 
-        // Step 2: Query DoctorServices to find doctors who provide the selected service
-        // Then filter only active doctors
+        // Query doctor_services junction table for doctors providing this service
         const { data: doctorServices, error: doctorServicesError } = await supabase
           .from('doctor_services')
           .select('doctor_id')
           .eq('service_id', serviceId);
 
         if (doctorServicesError) {
-          throw new Error(`Erreur lors de la récupération des médecins: ${doctorServicesError.message}`);
+          throw new Error(`Erreur lors de la récupération des médecins: ${doctorServicesError.message}, veuillez vérifier votre connexion`);
         }
 
+        // Return empty array if no doctors provide this service
         if (!doctorServices || doctorServices.length === 0) {
           setDoctors([]);
           setLoading(false);
           return;
         }
 
-        // Get unique doctor IDs
+        // Extract unique doctor IDs from junction table results
         const doctorIds = [...new Set(doctorServices.map(ds => ds.doctor_id))];
 
-        // Query Doctor table for active doctors
+        // Fetch active doctors from doctor table
         const { data: doctorsData, error: doctorsError } = await supabase
           .from('doctor')
           .select('doctor_id, name, email, description, profile_picture, specialty_name')
@@ -50,10 +57,10 @@ export const useDoctors = (serviceId = null) => {
           .eq('is_active', true);
 
         if (doctorsError) {
-          throw new Error(`Erreur lors de la récupération des médecins: ${doctorsError.message}`);
+          throw new Error(`Erreur lors de la récupération des médecins: ${doctorsError.message}, veuillez vérifier votre connexion`);
         }
 
-        // Transform data to match frontend format
+        // Transform database data to frontend format
         const transformedDoctors = (doctorsData || []).map(doctor => ({
           id: doctor.doctor_id,
           name: doctor.name,
@@ -66,7 +73,6 @@ export const useDoctors = (serviceId = null) => {
         setDoctors(transformedDoctors);
       } catch (err) {
         setError(err.message);
-        console.error('Error in useDoctors:', err);
         setDoctors([]);
       } finally {
         setLoading(false);

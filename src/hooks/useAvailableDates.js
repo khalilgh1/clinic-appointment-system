@@ -34,7 +34,7 @@ export const useAvailableDates = (doctorId, monthsAhead = 3) => {
           .eq('doctor_id', doctorId);
 
         if (scheduleError) {
-          throw new Error(`Erreur lors de la récupération du planning: ${scheduleError.message}`);
+          throw new Error(`Erreur lors de la récupération du planning: ${scheduleError.message} , veuillez vérifier votre connexion`);
         }
 
         if (!schedules || schedules.length === 0) {
@@ -56,7 +56,7 @@ export const useAvailableDates = (doctorId, monthsAhead = 3) => {
           .lte('date', endDate.toISOString().split('T')[0]);
 
         if (exceptionError) {
-          throw new Error(`Erreur lors de la récupération des exceptions: ${exceptionError.message}`);
+          throw new Error(`Erreur lors de la récupération des exceptions: ${exceptionError.message}, veuillez vérifier votre connexion`);
         }
 
         // Get existing appointments to check fully booked days
@@ -68,7 +68,7 @@ export const useAvailableDates = (doctorId, monthsAhead = 3) => {
           .lte('start_time', endDate.toISOString());
 
         if (appointmentError) {
-          throw new Error(`Erreur lors de la récupération des rendez-vous: ${appointmentError.message}`);
+          throw new Error(`Erreur lors de la récupération des rendez-vous: ${appointmentError.message}, veuillez vérifier votre connexion`);
         }
 
         // Generate available dates

@@ -2,7 +2,11 @@
 
 import React from 'react';
 
-// Fonction pour générer des initiales à partir du nom
+/**
+ * Generates initials from a name (max 2 letters)
+ * @param {string} name - Full name
+ * @returns {string} Uppercase initials
+ */
 const getInitials = (name) => {
   return name
     .split(' ')
@@ -12,7 +16,11 @@ const getInitials = (name) => {
     .slice(0, 2);
 };
 
-// Fonction pour générer une couleur basée sur le nom
+/**
+ * Generates consistent color based on name for avatar fallback
+ * @param {string} name - Name to generate color from
+ * @returns {string} Tailwind CSS color class
+ */
 const getColorFromName = (name) => {
   const colors = [
     'bg-blue-500', 'bg-green-500', 'bg-purple-500', 
@@ -22,6 +30,14 @@ const getColorFromName = (name) => {
   return colors[index];
 };
 
+/**
+ * DoctorCard - Displays doctor card for patient selection in booking flow
+ * Shows doctor info with visual selection state and fallback avatar
+ * @param {Object} props - Component props
+ * @param {Object} props.doctor - Doctor data
+ * @param {boolean} props.isSelected - Whether card is currently selected
+ * @param {Function} props.onClick - Click handler for selection
+ */
 const DoctorCard = ({ doctor, isSelected, onClick }) => {
   const { name, specialty, description, email } = doctor;
   
@@ -32,7 +48,7 @@ const DoctorCard = ({ doctor, isSelected, onClick }) => {
       onClick={onClick}
     >
       <div className="flex items-start gap-4 mb-4">
-        {/* profile picture */}
+        {/* Profile picture with fallback to colored initials */}
         {doctor.profilePicture ? (
            <img 
              src={doctor.profilePicture} 
@@ -40,7 +56,7 @@ const DoctorCard = ({ doctor, isSelected, onClick }) => {
              className="flex-shrink-0 w-16 h-16 rounded-full object-cover border border-gray-100"
              onError={(e) => {
                e.target.style.display = 'none';
-               e.target.nextSibling.style.display = 'flex'; // Show fallback if image fails
+               e.target.nextSibling.style.display = 'flex';
              }}
            />
         ) : null}
@@ -58,10 +74,12 @@ const DoctorCard = ({ doctor, isSelected, onClick }) => {
         </div>
       </div>
 
+      {/* Doctor description if available */}
       {description && (
         <p className="text-secondary-light text-sm mb-4 leading-relaxed">{description}</p>
       )}
 
+      {/* Footer with contact email */}
       <div className="mt-auto pt-4 border-t border-gray-100">
         <span className="text-primary text-sm font-medium">{email}</span>
       </div>

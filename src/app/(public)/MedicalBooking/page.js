@@ -11,22 +11,26 @@ import Finalization from '@/components/ui/BookingPage/Finalization';
 import { BookingProvider } from "@/context/BookingContext";
 import { supabase } from "@/lib/supabase/client";
 
-// Composant interne qui utilise le contexte
+/**
+ * BookingFlow - Main booking flow component managing step transitions
+ * Controls step progression and finalization state
+ * @param {Object} props - Component props
+ * @param {number} props.initialStep - Starting step (1-4)
+ */
 const BookingFlow = ({ initialStep }) => {
-  // Use a function to initialize state to ensure we get the correct initial value
-  const [currentStep, setCurrentStep] = useState(() => {
-    console.log('BookingFlow: Initializing currentStep with', initialStep);
-    return initialStep;
-  });
+  const [currentStep, setCurrentStep] = useState(() => initialStep);
   const [showFinalization, setShowFinalization] = useState(false);
 
-  console.log('BookingFlow render: initialStep =', initialStep, ', currentStep =', currentStep);
-
+  /**
+   * Scrolls to top of page for better UX during step transitions
+   */
   const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-
+  /**
+   * Advances to next step or shows finalization screen
+   */
   const goNext = () => {
     scrollToTop();
     if (currentStep === 4) {
@@ -36,6 +40,9 @@ const BookingFlow = ({ initialStep }) => {
     }
   };
 
+  /**
+   * Returns to previous step in booking flow
+   */
   const goBack = () => {
     scrollToTop();
     if (currentStep > 1) {
@@ -43,24 +50,24 @@ const BookingFlow = ({ initialStep }) => {
     }
   };
 
-
+  /**
+   * Returns to home page and resets booking state
+   */
   const handleReturnHome = () => {
-  // Reset State
-  setCurrentStep(1);
-  setShowFinalization(false);
-  // go home
-  window.location.href = '/';
-  } ;
+    setCurrentStep(1);
+    setShowFinalization(false);
+    window.location.href = '/';
+  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-bg-primary pt-6 md:pt-8">
       
-      {/* Sidebar */}
+      {/* Sidebar with step indicator */}
       <div className="w-full md:w-64 flex-shrink-0">
         <Sidebar currentStep={currentStep} contactPhone="+213 123 456 789" />
       </div>
 
-      {/* Main content */}
+      {/* Main booking content area */}
       <div className="flex-1 p-4 md:p-8"> 
         <div className="max-w-5xl mx-auto">
 
@@ -89,34 +96,36 @@ const BookingFlow = ({ initialStep }) => {
   );
 };
 
-// Loading component
+/**
+ * LoadingSpinner - Displayed during data fetching
+ */
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen bg-bg-primary">
     <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
-// Component that handles the search params
+/**
+ * MedicalBookingContent - Handles service parameter and initial data fetching
+ * Processes serviceId URL parameter to pre-select service and set initial step
+ */
 const MedicalBookingContent = () => {
   const searchParams = useSearchParams();
   const serviceId = searchParams.get('serviceId');
   
   const [bookingData, setBookingData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastServiceId, setLastServiceId] = useState(undefined); // Track what we last processed
+  const [lastServiceId, setLastServiceId] = useState(undefined);
 
+  // Fetch service data based on URL parameter
   useEffect(() => {
-    // If serviceId hasn't changed from what we processed, skip
     if (serviceId === lastServiceId && bookingData !== null) {
       return;
     }
 
     const fetchService = async () => {
-      console.log('MedicalBooking: Processing serviceId =', serviceId);
-      
       // If no serviceId, start from step 1 with no pre-selected service
       if (!serviceId) {
-        console.log('MedicalBooking: No serviceId, starting at step 1');
         setBookingData({ initialService: null, initialStep: 1 });
         setLastServiceId(serviceId);
         setIsLoading(false);
@@ -132,10 +141,8 @@ const MedicalBookingContent = () => {
           .eq('service_id', parseInt(serviceId))
           .single();
 
-        console.log('MedicalBooking: Fetched service =', service, 'error =', error);
-
         if (!error && service) {
-          // Format service for the booking context and start at step 2
+          // Pre-select service and start at step 2 (doctor selection)
           const data = {
             initialService: {
               id: service.service_id,
@@ -144,15 +151,12 @@ const MedicalBookingContent = () => {
             },
             initialStep: 2
           };
-          console.log('MedicalBooking: Setting bookingData with step 2 =', data);
           setBookingData(data);
         } else {
-          console.log('MedicalBooking: Service not found, starting at step 1');
           setBookingData({ initialService: null, initialStep: 1 });
         }
         setLastServiceId(serviceId);
       } catch (err) {
-        console.error('Error fetching service:', err);
         setBookingData({ initialService: null, initialStep: 1 });
         setLastServiceId(serviceId);
       } finally {
@@ -163,15 +167,12 @@ const MedicalBookingContent = () => {
     fetchService();
   }, [serviceId, lastServiceId, bookingData]);
 
-  // Don't render until we have the booking data AND we've processed the current serviceId
+  // Show loading spinner while fetching data
   if (isLoading || !bookingData || lastServiceId !== serviceId) {
-    console.log('MedicalBooking: Still loading...', { isLoading, bookingData, lastServiceId, serviceId });
     return <LoadingSpinner />;
   }
 
-  console.log('MedicalBooking: Final render with bookingData =', bookingData);
-
-  // Use a unique key that includes initialStep to force complete re-mount
+  // Unique key forces complete re-mount when step changes
   const componentKey = `booking-${serviceId || 'none'}-${bookingData.initialStep}`;
   
   return (
@@ -181,7 +182,10 @@ const MedicalBookingContent = () => {
   );
 };
 
-// MainComponent with Suspense wrapper
+/**
+ * MedicalBookingPage - Main booking page with Suspense wrapper
+ * Handles asynchronous operations and loading states
+ */
 const MedicalBookingPage = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
