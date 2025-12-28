@@ -28,7 +28,7 @@ export async function login(email, password) {
             };
         }
 
-        // Optional: Check if user is an admin (if you have a role field in your users table)
+        // Optional: Check if user is an admin
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('role')
@@ -40,7 +40,7 @@ export async function login(email, password) {
             // Continue with login even if user data fetch fails
         }
 
-        // Check if user is admin (optional - customize based on your schema)
+        // Check if user is admin
         if (userData && userData.role !== 'admin') {
             await supabase.auth.signOut();
             return {

@@ -57,7 +57,7 @@ export default async function Overview() {
 
     const totalPatients = uniquePatientsSet.size;
 
-    // Visitors: not available in `appointment` schema -> use dummy data
+    //we will use google analytics after deployment
     const totalVisitors = 113; // dummy
 
     // Prepare weekly trends (7 days) for appointments and unique patients per day
@@ -121,11 +121,13 @@ export default async function Overview() {
 
     return (
         <div className="space-y-6">
+            {/* title */}
             <header>
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>Tableau de bord</h1>
                 <p className="text-sm text-gray-600">Aperçu des statistiques récentes</p>
             </header>
 
+            {/* statistics section */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 rounded" style={{ background: 'white', borderRadius: 'var(--radius-md)' }}>
                     <div className="text-sm text-gray-500">Patients au total</div>
@@ -144,6 +146,7 @@ export default async function Overview() {
                 </div>
             </section>
 
+            {/* charts section */}
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 rounded" style={{ background: 'white', borderRadius: 'var(--radius-md)' }}>
                     <DailyTimeline data={hourlyData} />

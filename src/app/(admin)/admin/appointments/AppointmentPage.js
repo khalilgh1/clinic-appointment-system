@@ -59,8 +59,6 @@ const formatStatus = (value) => {
 }
 
 export default function AppointmentPage() {
-    // No client-side Supabase here — all appointment, doctor and service fetching
-    // is performed via server routes under `/api/*`.
     const [appointments, setAppointments] = useState([])
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState("")
@@ -176,6 +174,7 @@ export default function AppointmentPage() {
         ]
     }, [statuses])
 
+    // Apply filters and search
     const filtered = useMemo(() => {
         return appointments.filter((a) => {
             const q = search.trim().toLowerCase()
@@ -308,6 +307,7 @@ export default function AppointmentPage() {
             {/* advanced filters */}
             <div className="w-full mb-4 h-max">
                 <div className="bg-white border-gray-400 rounded-2xl p-10 shadow-sm h-full">
+                    {/* filter icon */}
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                             <div className="p-"><Funnel size={20} color="#064045" /></div>
@@ -318,6 +318,7 @@ export default function AppointmentPage() {
                         </div>
                     </div>
 
+                    {/* filters */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label className="text-xs text-gray-500 mb-1 block">Médecin</label>

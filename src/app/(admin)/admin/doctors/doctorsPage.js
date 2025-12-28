@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { UserPlus } from 'lucide-react';
 import DoctorCard from '@/components/ui/doctor_card';
-import ConfirmModal from '@/components/modals/ConfirmModal';
 
 // Modals
+import ConfirmModal from '@/components/modals/ConfirmModal';
 import AddDoctorModal from '@/components/modals/AddDoctorModal';
 import EditDoctorModal from '@/components/modals/EditDoctorModal';
 import ScheduleManagementModal from '@/components/modals/ScheduleManagementModal';
@@ -27,6 +27,7 @@ export default function DoctorsPage() {
     email: '',
     is_active: true
   });
+  // delete confirmation
   const [pendingDeleteDoctor, setPendingDeleteDoctor] = useState(null);
   // fetch doctors and schedules via server API
   const fetchDoctors = async () => {
@@ -49,6 +50,7 @@ export default function DoctorsPage() {
   const handleAddDoctor = async () => {
     if (formData.name && formData.specialty_name) {
       try {
+        //get form data
         const toInsert = {
           name: formData.name,
           specialty_name: formData.specialty_name,
@@ -104,6 +106,7 @@ export default function DoctorsPage() {
   const handleEditDoctor = async () => {
     if (formData.name && formData.specialty_name && selectedDoctor) {
       try {
+        //get form data
         const updates = {
           name: formData.name,
           specialty_name: formData.specialty_name,
@@ -244,7 +247,7 @@ export default function DoctorsPage() {
           end_time: formatTimeValue(end),
         })
       })
-
+      // send to server API to upsert
       const resp = await fetch('/api/doctors', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -255,6 +258,7 @@ export default function DoctorsPage() {
         console.error('Error saving schedules:', json)
       }
 
+      //get exceptions to insert/update
       const exceptionInserts = exceptionList
         .map((exception) => {
           const date = exception.date?.trim() || '';
