@@ -1,18 +1,22 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+export default async function ServicesPage() {
+  const supabase = await createClient();
 
-
-
-const supabase = await createClient();
-
-const { data: services, error } = await supabase
+  const { data: services = [], error } = await supabase
     .from("service")
-    .select("*")
+    .select("*");
 
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h2 className="text-2xl font-bold mb-4">All Services</h2>
+        <p className="text-red-600">Failed to load services.</p>
+      </div>
+    );
+  }
 
-
-export default function ServicesPage() {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">All Services</h2>
