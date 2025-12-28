@@ -58,7 +58,7 @@ export default async function Overview() {
     const totalPatients = uniquePatientsSet.size;
 
     // Visitors: not available in `appointment` schema -> use dummy data
-    const totalVisitors = 523; // dummy
+    const totalVisitors = 113; // dummy
 
     // Prepare weekly trends (7 days) for appointments and unique patients per day
     const days = [];

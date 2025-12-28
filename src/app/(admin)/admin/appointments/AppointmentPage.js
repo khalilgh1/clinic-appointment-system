@@ -117,6 +117,15 @@ export default function AppointmentPage() {
         fetchServices()
     }, [fetchAppointments, fetchDoctors, fetchServices])
 
+    const doctorMap = useMemo(() => {
+        const m = new Map()
+        ;(doctors || []).forEach((d) => {
+            const key = String(d.doctor_id ?? d.id ?? '')
+            m.set(key, d)
+        })
+        return m
+    }, [doctors])
+
     // Re-fetch when filters change so the list is fresh after a selection
     useEffect(() => {
         fetchAppointments()
@@ -246,8 +255,6 @@ export default function AppointmentPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ appointment_id: id }),
             })
-            console.log("Deleting appointment ID:", id)
-            console.log("Response:", res)
             const json = await res.json()
             if (!res.ok) throw json.error || new Error('Failed to delete')
             setAppointments((prev) => prev.filter((p) => p.appointment_id !== id))
@@ -407,7 +414,24 @@ export default function AppointmentPage() {
                                         <div className="text-sm text-gray-500">{a.patient_email}</div>
                                     </td>
                                     <td className="p-3">{a.patient_phone}</td>
-                                    <td className="p-3 bg-gray-50">{a.doctor_id ?? "-"}</td>
+                                    <td className="p-3 bg-gray-50">
+                                        {(() => {
+                                            const doc = doctorMap.get(String(a.doctor_id ?? ""))
+                                            if (!doc) return "-"
+                                            if (doc.last_name) return doc.last_name
+                                            if (doc.lastName) return doc.lastName
+                                            if (doc.first_name && doc.name) {
+                                                // if both first and full name exist, try to extract last token
+                                                const parts = String(doc.name).trim().split(/\s+/)
+                                                return parts.length > 0 ? parts[parts.length - 1] : doc.name
+                                            }
+                                            if (doc.name) {
+                                                const parts = String(doc.name).trim().split(/\s+/)
+                                                return parts.length > 0 ? parts[parts.length - 1] : doc.name
+                                            }
+                                            return String(a.doctor_id ?? "-")
+                                        })()}
+                                    </td>
                                     <td className="p-3">{a.service_id ?? "-"}</td>
                                     <td className="p-3 bg-gray-50">{a.start_time ? new Date(a.start_time).toISOString().split("T")[0] : "-"}</td>
                                     <td className="p-3">{a.end_time ? new Date(a.end_time).toISOString().split("T")[0] : "-"}</td>

@@ -10,10 +10,11 @@ import { logout } from './(auth)/login/actions';
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === '/admin/login';
+  const hideSidebarPaths = ['/admin/login', '/admin/reset'];
+  const isAuthPage = hideSidebarPaths.includes(pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (isLoginPage) {
+  if (isAuthPage) {
     return <>{children}</>;
   }
 

@@ -27,7 +27,6 @@ export async function PATCH(req) {
     try {
         const body = await req.json()
         const { action } = body || {}
-        console.log('PATCH /api/appointments body:', body)
         const sb = await createClient()
 
         // coerce numeric id strings into numbers to avoid type mismatches
@@ -52,7 +51,6 @@ export async function PATCH(req) {
         if (action === 'update') {
             const { appointment_id, changes } = body
             const id = coerceId(appointment_id)
-            console.log('Updating appointment', { appointment_id, id, changes })
             const { data, error } = await sb.from('appointment').update(changes).eq('appointment_id', id).select()
             if (error) {
                 console.error('Error updating appointment', error)

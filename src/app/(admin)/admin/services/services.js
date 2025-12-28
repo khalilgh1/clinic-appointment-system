@@ -26,6 +26,8 @@ export default function ServicesPage() {
         price: 0,
         duration_min: 0,
         is_active: true,
+        image: '',
+        image_file: null,
         exams: [],
         equipments: '',
         advantages: '',
@@ -50,7 +52,6 @@ export default function ServicesPage() {
             setLoading(false)
         }
     }
-    console.log(services[0]?.exams.fl)
     function parseListField(value) {
         if (!value) return []
         if (Array.isArray(value)) return value
@@ -80,6 +81,7 @@ export default function ServicesPage() {
         const payload = {
             name: formData.name,
             description: formData.description,
+            image: formData.image || null,
             price: Number(formData.price) || 0,
             duration_min: Number(formData.duration_min) || 0,
             is_active: !!formData.is_active,
@@ -87,6 +89,28 @@ export default function ServicesPage() {
             equipments: JSON.stringify(parseListField(formData.equipments)),
             advantages: JSON.stringify(parseListField(formData.advantages)),
             procedures: JSON.stringify(parseListField(formData.procedures))
+        }
+        // upload image if a file was selected
+        if (formData.image_file) {
+            try {
+                const file = formData.image_file
+                const resp = await fetch('/api/upload-profile', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': file.type || 'application/octet-stream',
+                        'x-filename': file.name
+                    },
+                    body: file
+                })
+                const json = await resp.json()
+                if (resp.ok && json.publicUrl) {
+                    payload.image = json.publicUrl
+                } else {
+                    console.error('Upload failed:', json)
+                }
+            } catch (err) {
+                console.error('Error uploading service image via server route:', err)
+            }
         }
         try {
             setLoading(true)
@@ -99,6 +123,7 @@ export default function ServicesPage() {
             if (!resp.ok) throw json
             setShowAddModal(false)
             setFormData({ name: '', description: '', price: 0, duration_min: 0, is_active: true, exams: [], equipments: '', advantages: '', procedures: '' })
+
             fetchServices()
         } catch (err) {
             setError(err?.message || JSON.stringify(err) || String(err))
@@ -112,6 +137,7 @@ export default function ServicesPage() {
         const payload = {
             name: formData.name,
             description: formData.description,
+            image: formData.image || null,
             price: Number(formData.price) || 0,
             duration_min: Number(formData.duration_min) || 0,
             is_active: !!formData.is_active,
@@ -119,6 +145,28 @@ export default function ServicesPage() {
             equipments: JSON.stringify(parseListField(formData.equipments)),
             advantages: JSON.stringify(parseListField(formData.advantages)),
             procedures: JSON.stringify(parseListField(formData.procedures))
+        }
+        // If a new file was selected, upload and set the new image URL
+        if (formData.image_file) {
+            try {
+                const file = formData.image_file
+                const resp = await fetch('/api/upload-profile', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': file.type || 'application/octet-stream',
+                        'x-filename': file.name
+                    },
+                    body: file
+                })
+                const json = await resp.json()
+                if (resp.ok && json.publicUrl) {
+                    payload.image = json.publicUrl
+                } else {
+                    console.error('Upload failed:', json)
+                }
+            } catch (err) {
+                console.error('Error uploading service image via server route:', err)
+            }
         }
         try {
             setLoading(true)
@@ -187,6 +235,7 @@ export default function ServicesPage() {
         setFormData({
             name: service.name || '',
             description: service.description || '',
+            image: service.image || '',
             price: service.price ?? 0,
             duration_min: service.duration_min ?? 0,
             is_active: !!service.is_active,
@@ -207,6 +256,8 @@ export default function ServicesPage() {
             price: 0,
             duration_min: 0,
             is_active: true,
+            image: '',
+            image_file: null,
             exams: [],
             equipments: '',
             advantages: '',

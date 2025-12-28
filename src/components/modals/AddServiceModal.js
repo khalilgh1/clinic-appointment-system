@@ -64,6 +64,21 @@ export default function AddServiceModal(props) {
 
                 <div className="space-y-4">
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => props.setFormData({ ...props.formData, image_file: e.target.files && e.target.files[0] ? e.target.files[0] : null })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                        />
+                        {props.formData.image && !props.formData.image_file && (
+                            <img src={props.formData.image} alt="preview" className="mt-2 h-24 w-24 object-cover rounded" />
+                        )}
+                        {props.formData.image_file && (
+                            <p className="text-sm text-gray-500 mt-2">Fichier sélectionné: {props.formData.image_file.name}</p>
+                        )}
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
                         <input type="text" value={props.formData.name} onChange={e => props.setFormData({ ...props.formData, name: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
