@@ -91,7 +91,7 @@ export default function DoctorsPage() {
           return
         }
         const inserted = json.doctor
-        const newDoctor = { ...inserted, schedule: {}, workDays: '' }
+        const newDoctor = { ...inserted, schedule: {}, workDays: '', exceptions: [] }
         setDoctors((prev) => [...prev, newDoctor])
         setFormData({ name: '', specialty_name: '', profile_picture: '', profile_file: null, description: '', email: '', is_active: true });
         setShowAddModal(false);
@@ -225,24 +225,23 @@ export default function DoctorsPage() {
     if (!selectedDoctor) return;
     const doctorId = selectedDoctor.doctor_id;
     const schedule = selectedDoctor.schedule || {};
+    const exceptionList = selectedDoctor.exceptions || [];
 
     // map French day names to numeric day_of_week (1 = Lundi)
     const dayToIdx = { Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 7 };
+    const formatTimeValue = (t) => (t ? (t.length === 5 ? `${t}:00` : t) : null);
 
     try {
-      // prepare inserts
       const inserts = [];
       Object.entries(schedule).forEach(([day, times]) => {
         const start = times?.start?.trim();
         const end = times?.end?.trim();
-        // skip empty entries
         if (!start && !end) return;
-        const formatTime = (t) => (t ? (t.length === 5 ? `${t}:00` : t) : null);
         inserts.push({
           doctor_id: doctorId,
           day_of_week: dayToIdx[day] || null,
-          start_time: formatTime(start),
-          end_time: formatTime(end),
+          start_time: formatTimeValue(start),
+          end_time: formatTimeValue(end),
         })
       })
 
@@ -256,7 +255,29 @@ export default function DoctorsPage() {
         console.error('Error saving schedules:', json)
       }
 
-      // update local state
+      const exceptionInserts = exceptionList
+        .map((exception) => {
+          const date = exception.date?.trim() || '';
+          return {
+            doctor_id: doctorId,
+            date,
+            start_time: formatTimeValue(exception.start_time),
+            end_time: formatTimeValue(exception.end_time),
+            is_available: Boolean(exception.is_available),
+          }
+        })
+        .filter((entry) => entry.date)
+
+      const exceptionsResp = await fetch('/api/doctors', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'exceptions', doctor_id: doctorId, inserts: exceptionInserts }),
+      })
+      const exceptionsJson = await exceptionsResp.json()
+      if (!exceptionsResp.ok) {
+        console.error('Error saving exceptions:', exceptionsJson)
+      }
+
       setDoctors((prev) => prev.map((d) => (d.doctor_id === doctorId ? selectedDoctor : d)))
       setShowScheduleModal(false)
     } catch (err) {
