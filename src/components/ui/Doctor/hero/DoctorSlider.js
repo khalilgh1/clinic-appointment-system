@@ -13,10 +13,10 @@ const DoctorSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    { id: 1, image: '/doctorslider1.png', alt: 'Doctor 1' },
-    { id: 2, image: '/doctorslider2.png', alt: 'Doctor 2' },
-    { id: 3, image: '/doctorslider3.png', alt: 'Doctor 3' },
-    { id: 4, image: '/doctorslider4.png', alt: 'Doctor 4' },
+    { id: 1, image: '/doctorslider1_v3.png', alt: 'Doctor 1' },
+    { id: 2, image: '/doctorslider2_v2.png', alt: 'Doctor 2' },
+    { id: 3, image: '/doctorslider3_v2.1.png', alt: 'Doctor 3' },
+    { id: 4, image: '/doctorslider4_v3.png', alt: 'Doctor 4' },
   ];
 
   // Auto-scroll functionality
