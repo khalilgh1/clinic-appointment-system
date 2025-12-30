@@ -21,7 +21,7 @@ export default function InfosSection() {
         }}
       >
         <img
-          src="/fertility.png"
+          src="/fertility_v2.png"
           alt="Fertility"
           style={{
             flex: 1,
@@ -146,7 +146,7 @@ export default function InfosSection() {
         </div>
 
         <img
-          src="/homeimg.png"
+          src="/homeimg_v2.png"
           alt="Docteur"
           style={{
             flex: 1,
@@ -167,7 +167,7 @@ export default function InfosSection() {
         }}
       >
         <img
-          src="/homeimg2.png"
+          src="/homeimg2_v2.png"
           alt="Docteur"
           style={{
             flex: 1,
