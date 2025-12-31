@@ -98,15 +98,20 @@ export default function ServicesDropdown({ isMobile = false, isActive = false, t
   if (isMobile) {
     return (
       <div className="border-t border-gray-100 py-4">
-        <div className="px-6 mb-3">
-          <span className={`font-medium text-lg ${
-            isTheme1 ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)]'
-          }`}>
-            Services
-          </span>
+        <div className="px-6 mb-1">
+          <button
+            onClick={() => setIsOpen(prev => !prev)}
+            className={`w-full flex items-center justify-between font-medium text-lg transition-colors duration-200 ${isTheme1 ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)]'
+              }`}
+            aria-expanded={isOpen}
+            aria-controls="mobile-services-list"
+          >
+            <span>Services</span>
+            <ChevronDown size={18} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
         </div>
-        
-        <div className="space-y-1">
+
+        <div id="mobile-services-list" className={`${isOpen ? 'block' : 'hidden'} space-y-1 px-0`}>
           {loading ? (
             <div className="px-6 py-2 text-gray-500">Chargement...</div>
           ) : services.length > 0 ? (
@@ -135,36 +140,31 @@ export default function ServicesDropdown({ isMobile = false, isActive = false, t
       onMouseLeave={handleMouseLeave}
     >
       <button className="relative">
-        <span className={`text-sm font-medium transition-colors duration-300 ${
-          isActive
+        <span className={`text-sm font-medium transition-colors duration-300 ${isActive
             ? isTheme1 ? 'text-[var(--color-primary)]' : 'text-white'
             : isTheme1
               ? 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
               : 'text-white/80 group-hover:text-white'
-        }`}>
+          }`}>
           Services
         </span>
-        <ChevronDown 
-          size={14} 
-          className={`inline-block ml-1 transition-all duration-300 ${
-            isOpen ? 'rotate-180' : ''
-          } ${
-            isActive
+        <ChevronDown
+          size={14}
+          className={`inline-block ml-1 transition-all duration-300 ${isOpen ? 'rotate-180' : ''
+            } ${isActive
               ? isTheme1 ? 'text-[var(--color-primary)]' : 'text-white'
               : isTheme1
                 ? 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
                 : 'text-white/80 group-hover:text-white'
-          }`}
+            }`}
         />
-        <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
-          isTheme1 ? 'bg-[var(--color-primary)]' : 'bg-white'
-        } ${isActive || isOpen ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+        <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${isTheme1 ? 'bg-[var(--color-primary)]' : 'bg-white'
+          } ${isActive || isOpen ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
       </button>
 
       <div
-        className={`absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border border-gray-100 ${
-          isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4 pointer-events-none'
-        }`}
+        className={`absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 border border-gray-100 ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4 pointer-events-none'
+          }`}
       >
         <div className="p-2">
           {loading ? (

@@ -137,16 +137,12 @@ export default function Navbar({ currentPath = '/' }) {
                 <div className="px-6 py-4 mt-2">
                   <Link
                     href="/MedicalBooking"
-                    className={`block w-full text-center px-6 py-4 rounded-full font-medium transition-all duration-300 flex items-center justify-center gap-3 text-base hover:shadow-lg hover:scale-[1.02] active:scale-95 ${isTheme1
-                      ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-secondary-light)]'
-                      : 'bg-white text-[var(--color-text-secondary)] hover:bg-gray-50'
-                      }`}
+                    className={`block w-full text-center px-6 py-4 rounded-full font-medium transition-all duration-300 flex items-center justify-center gap-3 text-base hover:shadow-lg hover:scale-[1.02] active:scale-95 bg-[var(--color-primary)] text-white hover:bg-[var(--color-secondary-light)]`}
                   >
                     <span className="flex items-center">Prendre Rendez-Vous</span>
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:translate-x-1 ${isTheme1 ? 'bg-white' : 'bg-[var(--color-primary)]'
-                      }`}>
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:translate-x-1 bg-white`}>
                       <ArrowRight
-                        className={`w-4 h-4 ${isTheme1 ? 'text-[var(--color-primary)]' : 'text-white'}`}
+                        className={`w-4 h-4 text-[var(--color-primary)]`}
                         strokeWidth={2.5}
                       />
                     </span>
