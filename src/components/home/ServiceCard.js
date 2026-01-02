@@ -33,6 +33,10 @@ export default function ServiceCard({ icon, title, description, id }) {
           src={icon}
           alt={title}
           style={{ width: '65%', height: '65%', objectFit: 'contain' }}
+          onError={(e) => {
+            // Hide broken images or set a fallback
+            e.target.style.display = 'none';
+          }}
         />
       </div>
 

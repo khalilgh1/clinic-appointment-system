@@ -5,7 +5,7 @@ const AboutUsPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-[#064045] rounded-3xl mx-2 sm:mx-5 mt-5 overflow-hidden">
+      <section className="relative bg-[#064045] rounded-3xl mx-2 sm:mx-5 overflow-hidden">
         <div className="absolute inset-0 bg-white/[0.02]" />
         
         <div className="relative px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20">

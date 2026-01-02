@@ -45,17 +45,41 @@ function SliderButton({ direction, onClick }) {
 
 export default function ServicesSlider() {
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showButtons, setShowButtons] = useState(true);
   const sliderRef = useRef(null);
 
   useEffect(() => {
     const fetchServices = async () => {
-      const { data, error } = await supabase()
+      setLoading(true);
+      const supabaseClient = supabase();
+      const { data, error } = await supabaseClient
         .from("service")
         .select("*")
         .eq("is_active", true);
 
-      if (!error) setServices(data);
+      if (!error && data) {
+        // Transform icon paths to public URLs if they're stored in Supabase storage
+        const transformedServices = data.map((service) => {
+          let iconUrl = service.icon;
+          
+          // If icon is not already a full URL or local path, treat it as a storage path
+          if (iconUrl && !iconUrl.startsWith('http') && !iconUrl.startsWith('/')) {
+            // Convert storage path to public URL (using service-icons as the bucket name)
+            // If your bucket name is different, you can change it here or make it configurable
+            const bucketName = 'service-icons'; // Common bucket names: 'service-icons', 'icons', 'images'
+            const { data: urlData } = supabaseClient.storage.from(bucketName).getPublicUrl(iconUrl);
+            iconUrl = urlData.publicUrl;
+          }
+          
+          return { ...service, icon: iconUrl };
+        });
+        
+        setServices(transformedServices);
+      } else {
+        setServices([]);
+      }
+      setLoading(false);
     };
 
     fetchServices();
@@ -86,52 +110,58 @@ export default function ServicesSlider() {
         description="Nous offrons un large choix de solutions de santé, incluant le conseil, le diagnostic, la télémédecine, la rééducation et les consultations d'experts."
       />
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "clamp(8px, 2vw, 16px)",
-          marginTop: "3rem",
-          position: "relative",
-          width: "100%",
-        }}
-      >
-        {showButtons && (
-          <SliderButton direction="left" onClick={() => scroll("left")} />
-        )}
-
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "3rem 0", color: "#707677" }}>
+          Chargement des services...
+        </div>
+      ) : (
         <div
-          ref={sliderRef}
-          className="no-scrollbar"
           style={{
             display: "flex",
-            gap: "clamp(12px, 2vw, 16px)",
-            overflowX: "auto",
-            overflowY: "hidden",
-            scrollBehavior: "smooth",
-            flexWrap: "nowrap",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "clamp(8px, 2vw, 16px)",
+            marginTop: "3rem",
+            position: "relative",
             width: "100%",
-            maxWidth: "1243px",
-            padding: "0 8px",
           }}
         >
-          {services.map((service) => (
-            <div key={service.service_id} style={{ flex: "0 0 auto" }}>
-              <ServiceCard
-                icon={service.icon}
-                title={service.name}
-                description={service.description}
-                id ={service.service_id}
-              />
-            </div>
-          ))}
-        </div>
+          {showButtons && (
+            <SliderButton direction="left" onClick={() => scroll("left")} />
+          )}
 
-        {showButtons && (
-          <SliderButton direction="right" onClick={() => scroll("right")} />
-        )}
-      </div>
+          <div
+            ref={sliderRef}
+            className="no-scrollbar"
+            style={{
+              display: "flex",
+              gap: "clamp(12px, 2vw, 16px)",
+              overflowX: "auto",
+              overflowY: "hidden",
+              scrollBehavior: "smooth",
+              flexWrap: "nowrap",
+              width: "100%",
+              maxWidth: "1243px",
+              padding: "0 8px",
+            }}
+          >
+            {services.map((service) => (
+              <div key={service.service_id} style={{ flex: "0 0 auto" }}>
+                <ServiceCard
+                  icon={service.icon}
+                  title={service.name}
+                  description={service.description}
+                  id ={service.service_id}
+                />
+              </div>
+            ))}
+          </div>
+
+          {showButtons && (
+            <SliderButton direction="right" onClick={() => scroll("right")} />
+          )}
+        </div>
+      )}
     </section>
   );
 }
